@@ -10,7 +10,7 @@ datasource db {
 model AppUser {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   userId      String   @unique @map("user_id")
-  webUserId   String   @map("web_user_id")
+  webUserId   String?   @map("web_user_id")
   firstName   String?  @map("first_name")
   lastName    String?  @map("last_name")
   displayName String?  @map("display_name")
@@ -25,9 +25,8 @@ model AppUser {
   deletedCalls DeletedCall[]
   messages     Message[]
   folders      Folder[]
-  settings     Settings[]
 
-  @@map("app_user")
+  @@map("appUser")
 }
 
 model DeletedCall {
@@ -38,7 +37,7 @@ model DeletedCall {
 
   appUser AppUser? @relation(fields: [userId], references: [userId])
 
-  @@map("deleted_calls")
+  @@map("deletedCalls")
 }
 
 model Folder {
@@ -84,7 +83,7 @@ model MessageInFolder {
   folder  Folder?  @relation(fields: [folderId], references: [id])
 
   @@unique([messageId, folderId])
-  @@map("message_in_folder")
+  @@map("messageInFolder")
 }
 
 model MessageSent {
@@ -97,21 +96,7 @@ model MessageSent {
 
   phoneCall PhoneCall? @relation(fields: [phoneCallId], references: [id])
 
-  @@map("messages_sent")
-}
-
-model Settings {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  key        String
-  value      String
-  userId     String   @map("user_id")
-  enabled    Boolean
-  modifiedAt DateTime @default(now()) @map("modified_at")
-  appUser    AppUser? @relation(fields: [appUserId], references: [id])
-  appUserId  String?  @map("app_user_id") @db.ObjectId
-
-  @@unique([key, userId])
-  @@map("settings")
+  @@map("messagesSent")
 }
 
 model PhoneCall {
@@ -129,5 +114,5 @@ model PhoneCall {
 
   messagesSent MessageSent[]
 
-  @@map("phone_calls")
+  @@map("phoneCalls")
 }

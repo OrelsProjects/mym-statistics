@@ -26,7 +26,9 @@ if (typeof window !== "undefined") {
 if (app) {
   if (canUseNotifications()) {
     if (Notification.permission === "granted") {
-      messaging = getMessaging(app);
+      try {
+        messaging = getMessaging(app);
+      } catch (error: any) {}
     }
   }
 }

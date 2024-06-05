@@ -101,15 +101,33 @@ export const signIn = async (session: any) => {
     });
 
     if (!userInDB) {
-      const newUser = await prisma.appUser.create({
-        data: {
-          userId: session.user.id,
-          email: session.user.email || "",
-          displayName: session.user.name || "",
-          webUserId: session.user.id,
+      let oldUser = await prisma.appUser.findFirst({
+        where: {
+          email: session.user.email,
         },
       });
-      additionalUserData = { ...newUser };
+      if (oldUser) {
+        const oldUser = await prisma.appUser.update({
+          where: {
+            email: session.user.email,
+          },
+          data: {
+            webUserId: session.user.id,
+            displayName: session.user.name,
+          },
+        });
+        additionalUserData = { ...oldUser };
+      } else {
+        const newUser = await prisma.appUser.create({
+          data: {
+            userId: session.user.id,
+            email: session.user.email || "",
+            displayName: session.user.name || "",
+            webUserId: session.user.id,
+          },
+        });
+        additionalUserData = { ...newUser };
+      }
     }
 
     return {
