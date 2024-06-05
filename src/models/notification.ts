@@ -1,4 +1,4 @@
-export type NotificationType = "saas-template";
+export type NotificationType = "mym-web";
 
 export type NotificationData = {
   title: string;
