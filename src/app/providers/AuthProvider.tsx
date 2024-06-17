@@ -93,6 +93,7 @@ export default function AuthProvider({
       }
     }
   }, [status]);
+  
   if (status === "loading") {
     return (
       <div className="w-screen h-screen flex items-center justify-center">
