@@ -12,8 +12,9 @@ import Loading from "@/components/ui/loading";
 import { setUserEventTracker } from "../../eventTracker";
 import { setUserLogger } from "../../logger";
 import { useSession } from "next-auth/react";
-import AppUser from "../../models/appUser";
 import { useAppDispatch } from "../../lib/hooks/redux";
+import { DefaultSession, SessionUser } from "next-auth";
+import { AppUser } from "@prisma/client";
 
 export default function AuthProvider({
   children,
@@ -26,27 +27,20 @@ export default function AuthProvider({
   const { user: currentUser } = useSelector(selectAuth);
   const { data: session, status } = useSession();
 
-  const setUser = async (user?: {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-    userId?: string | null;
-    meta: {
-      referralCode?: string | null;
-    };
-  }) => {
+  const setUser = async (user?: SessionUser & DefaultSession["user"]) => {
     try {
       const appUser: AppUser = {
         displayName: user?.name || null,
         email: user?.email || "",
-        photoURL: user?.image || null,
-        userId: user?.userId || "",
-        settings: {
-          showNotifications: true,
-        },
-        meta: {
-          referralCode: user?.meta.referralCode || "",
-        },
+        id: user?.userId || "",
+        firstName: "",
+        lastName: "",
+        webUserId: user?.webUserId || "",
+        number: "",
+        gender: "",
+        isActive: false,
+        createdAt: new Date(),
+        photoURL: user?.image || "",
       };
       dispatch(setUserAction(appUser));
     } catch (error: any) {
@@ -58,7 +52,11 @@ export default function AuthProvider({
   useEffect(() => {
     switch (status) {
       case "authenticated":
-        setUser(session.user);
+        if (session.user) {
+          setUser(session.user);
+        } else {
+          setUser(undefined);
+        }
 
         break;
       case "loading":
@@ -93,7 +91,7 @@ export default function AuthProvider({
       }
     }
   }, [status]);
-  
+
   if (status === "loading") {
     return (
       <div className="w-screen h-screen flex items-center justify-center">

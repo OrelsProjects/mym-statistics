@@ -1,5 +1,5 @@
 import { StatusType, datadogLogs } from "@datadog/browser-logs";
-import AppUser from "./models/appUser";
+import { AppUser } from "@prisma/client";
 
 interface Dict {
   [key: string]: any;
@@ -30,7 +30,7 @@ export const initLogger = () => {
 
 export const setUserLogger = (user?: AppUser | null) => {
   datadogLogs.setUser({
-    id: user?.userId,
+    id: user?.id,
     name: user?.displayName || "",
     email: user?.email,
   });

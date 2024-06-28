@@ -10,7 +10,6 @@ import { Switch } from "../../../components/ui/switch";
 import axios from "axios";
 import { canUseNotifications } from "../../../lib/utils/notificationUtils";
 import useNotification from "../../../lib/hooks/useNotification";
-import { updateUserSettings } from "../../../lib/features/auth/authSlice";
 import { ThemeToggle } from "../../../components/themeToggle";
 import Divider from "../../../components/ui/divider";
 
@@ -22,12 +21,12 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
   const { deleteUser, signOut } = useAuth();
   const { initNotifications: initUserToken, requestNotificationsPermission } =
     useNotification();
-  const [settings, setSettings] = useState(
-    user?.settings ?? {
-      showNotifications: false,
-      soundEffects: true,
-    },
-  );
+  const [settings, setSettings] =
+    useState();
+    // user?.settings ?? {
+    //   showNotifications: false,
+    //   soundEffects: true,
+    // },
 
   const changeNotificationTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -40,7 +39,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
 
   useEffect(() => {
     if (user) {
-      setSettings(user?.settings);
+      // setSettings(user?.settings);
     }
   }, [user]);
 
@@ -49,7 +48,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
       clearTimeout(changeNotificationTimeout.current);
     }
 
-    setSettings({ ...settings, showNotifications });
+    // setSettings({ ...settings, showNotifications });
 
     changeNotificationTimeout.current = setTimeout(async () => {
       changeNotificationTimeout.current = null;
@@ -58,7 +57,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
         if (showNotifications) {
           await initUserToken();
         }
-        dispatch(updateUserSettings({ showNotifications }));
+        // dispatch(updateUserSettings({ showNotifications }));
       } catch (e) {
         toast.error("Failed to update notification settings");
       }
@@ -115,7 +114,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
                 <Switch
                   className="w-10"
                   onCheckedChange={updateNotificationSettings}
-                  checked={settings.showNotifications}
+                  // checked={settings.showNotifications}
                 />
               ) : (
                 <Button

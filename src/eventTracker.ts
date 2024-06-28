@@ -1,6 +1,6 @@
 import posthog from "posthog-js";
 import { Logger } from "./logger";
-import AppUser from "./models/appUser";
+import { AppUser } from "@prisma/client";
 
 enum TimeoutLength {
   SHORT = 100,
@@ -21,7 +21,7 @@ export const initEventTracker = () => {
 
 export const setUserEventTracker = (user?: AppUser | null) => {
   try {
-    posthog.identify(user?.userId);
+    posthog.identify(user?.id || "");
   } catch (error: any) {
     Logger.error("Error setting user for event tracker", {
       data: {

@@ -1,9 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../../../../auth/authOptions";
-import AppUser from "../../../../../models/appUser";
 import prisma from "../../../_db/db";
-import Logger from "../../../../../loggerServer";
 import {
   PhonecallCountStatistics,
   PhonecallCountStatisticsType,
@@ -33,10 +31,12 @@ export async function GET(
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
       const calls = await prisma.phoneCall.findMany({
         where: {
+          appUser: {
+            webUserId: session.user?.webUserId,
+          },
           AND: [
             { startDate: { gte: oneWeekAgo } },
             { endDate: { lte: today } },
-            { userId: session.user?.userId },
           ],
         },
       });

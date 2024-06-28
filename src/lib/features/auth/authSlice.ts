@@ -1,7 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
 import _ from "lodash";
-import AppUser, { AppUserSettings } from "../../../models/appUser";
+import {
+  MessageWithFolder,
+  MessageWithNestedFolders,
+} from "../../../models/message";
+import { AppUser } from "@prisma/client";
 
 export type AuthStateType =
   | "anonymous"
@@ -14,7 +18,10 @@ export interface AuthState {
   isAdmin: boolean;
   state: AuthStateType;
   loading: boolean;
+  loadingData?: boolean;
   error: string | null;
+  data: MessageWithFolder[];
+  isDataFetched?: boolean;
 }
 
 export const initialState: AuthState = {
@@ -22,7 +29,10 @@ export const initialState: AuthState = {
   isAdmin: false,
   state: "unauthenticated",
   loading: true,
+  loadingData: false,
   error: null,
+  data: [],
+  isDataFetched: false,
 };
 
 const authSlice = createSlice({
@@ -47,20 +57,6 @@ const authSlice = createSlice({
       }
       state.state = action.payload.state ?? "authenticated";
     },
-    updateUserSettings: (
-      state,
-      action: PayloadAction<Partial<AppUserSettings>>,
-    ) => {
-      if (state.user) {
-        state.user = {
-          ...state.user,
-          settings: {
-            ...state.user.settings,
-            ...action.payload,
-          },
-        };
-      }
-    },
     setError: (state, action: PayloadAction<string | null>) => {
       console.error(action.payload);
       state.error = action.payload;
@@ -71,10 +67,18 @@ const authSlice = createSlice({
       state.user = null;
       state.state = "unauthenticated";
     },
+    setLoadingData: (state, action: PayloadAction<boolean>) => {
+      state.loadingData = action.payload;
+    },
+    setUserData: (state, action: PayloadAction<MessageWithFolder[]>) => {
+      state.data = action.payload;
+      state.isDataFetched = true;
+      state.loadingData = false;
+    },
   },
 });
 
-export const { setUser, updateUserSettings, setError, clearUser } =
+export const { setUser, setError, clearUser, setUserData, setLoadingData } =
   authSlice.actions;
 
 export const selectAuth = (state: RootState): AuthState => state.auth;

@@ -24,9 +24,9 @@ const NotificationsProvider = () => {
         });
       });
     };
-    if (messaging && user?.settings.showNotifications) {
-      init(messaging);
-    }
+    // if (messaging && user?.settings.showNotifications) {
+    //   init(messaging);
+    // }
   }, [user, messaging]);
 
   return <></>;

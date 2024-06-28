@@ -1,47 +1,58 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model AppUser {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @unique @map("user_id")
-  webUserId   String?   @map("web_user_id")
-  firstName   String?  @map("first_name")
-  lastName    String?  @map("last_name")
+  id          String   @id @unique
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  webUserId   String?  @unique @map("web_user_id")
   displayName String?  @map("display_name")
   email       String   @unique
-  number      String?
-  gender      String?
-  isActive    Boolean  @default(true) @map("is_active")
+  number      String
+  gender      String
+  isActive    Boolean  @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
-
-  password String?
+  photoURL    String?  @map("photo_url")
 
   deletedCalls DeletedCall[]
   messages     Message[]
   folders      Folder[]
+  settings     Setting[]
+  PhoneCall    PhoneCall[]
 
-  @@map("appUser")
+  @@map("app_users")
 }
 
-model DeletedCall {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @map("user_id")
-  deletedAt DateTime @default(now()) @map("deleted_at")
-  number    String
+model PhoneCall {
+  id             String        @id @default(uuid())
+  oldPhoneCallId String?       @map("old_phone_call_id")
+  number         String
+  startDate      DateTime?     @default(now()) @map("start_date")
+  endDate        DateTime?     @default(now()) @map("end_date")
+  actualEndDate  DateTime?     @default(now()) @map("actual_end_date")
+  type           String
+  isAnswered     Boolean       @map("is_answered")
+  userId         String        @map("user_id")
+  isActive       Boolean       @map("is_active")
+  contactName    String        @map("contact_name")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  messagesSent   MessageSent[]
 
-  appUser AppUser? @relation(fields: [userId], references: [userId])
+  appUser AppUser? @relation(fields: [userId], references: [id])
 
-  @@map("deletedCalls")
+  @@unique([userId, number, startDate])
+  @@map("phone_calls")
 }
 
 model Folder {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   title     String
   timesUsed Int      @map("times_used")
   position  Int
@@ -49,70 +60,83 @@ model Folder {
   isActive  Boolean  @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
 
-  appUser         AppUser?          @relation(fields: [userId], references: [userId])
-  messageInFolder MessageInFolder[]
+  appUser          AppUser?          @relation(fields: [userId], references: [id])
+  messagesInFolder MessageInFolder[]
 
   @@map("folders")
 }
 
 model Message {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String   @map("user_id")
-  title      String
-  shortTitle String   @map("short_title")
-  body       String
-  position   Int
-  timesUsed  Int      @map("times_used")
-  isActive   Boolean  @map("is_active")
-  createdAt  DateTime @default(now()) @map("created_at")
+  id           String   @id @default(uuid())
+  oldMessageId String?  @map("old_message_id")
+  userId       String   @map("user_id")
+  title        String
+  shortTitle   String   @map("short_title")
+  body         String
+  position     Int
+  timesUsed    Int      @map("times_used")
+  isActive     Boolean  @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  appUser          AppUser?          @relation(fields: [userId], references: [userId])
+  appUser          AppUser?          @relation(fields: [userId], references: [id])
   messagesInFolder MessageInFolder[]
 
   @@map("messages")
 }
 
+model DeletedCall {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  deletedAt DateTime @default(now()) @map("deleted_at")
+  number    String
+
+  appUser AppUser? @relation(fields: [userId], references: [id])
+
+  @@map("deleted_calls")
+}
+
 model MessageInFolder {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  messageId String   @map("message_id") @db.ObjectId
-  folderId  String   @map("folder_id") @db.ObjectId
+  id        String   @id @default(uuid())
+  messageId String   @map("message_id")
+  folderId  String   @map("folder_id")
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
+
+  userIdMessage String? @map("user_id_message")
+  userIdFolder  String? @map("user_id_folder")
+  oldFolderId   String? @map("old_folder_id")
+  oldMessageId  String? @map("old_message_id")
 
   message Message? @relation(fields: [messageId], references: [id])
   folder  Folder?  @relation(fields: [folderId], references: [id])
 
   @@unique([messageId, folderId])
-  @@map("messageInFolder")
+  @@map("messages_in_folders")
 }
 
 model MessageSent {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(uuid())
   sentAt      DateTime? @default(now()) @map("sent_at")
   messageId   String    @map("message_id")
-  phoneCallId String    @map("phone_call_id") @db.ObjectId
+  phoneCallId String    @map("phone_call_id")
   isActive    Boolean   @map("is_active")
   createdAt   DateTime  @default(now()) @map("created_at")
 
-  phoneCall PhoneCall? @relation(fields: [phoneCallId], references: [id])
+  phoneCall PhoneCall? @relation(fields: [phoneCallId], references: [id], onDelete: Cascade)
 
-  @@map("messagesSent")
+  @@map("messsages_sent")
 }
 
-model PhoneCall {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  number        String
-  startDate     DateTime? @default(now()) @map("start_date")
-  endDate       DateTime? @default(now()) @map("end_date")
-  actualEndDate DateTime? @default(now()) @map("actual_end_date")
-  type          String
-  isAnswered    Boolean   @map("is_answered")
-  userId        String    @map("user_id")
-  isActive      Boolean   @map("is_active")
-  contactName   String    @map("contact_name")
-  createdAt     DateTime  @default(now()) @map("created_at")
+model Setting {
+  id         String   @id @default(uuid())
+  key        String
+  value      String
+  userId     String   @map("user_id")
+  enabled    Boolean
+  modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
 
-  messagesSent MessageSent[]
+  appUser AppUser? @relation(fields: [userId], references: [id])
 
-  @@map("phoneCalls")
+  @@unique([key, userId])
+  @@map("settings")
 }
