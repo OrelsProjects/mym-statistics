@@ -31,13 +31,10 @@ export async function GET(
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
       const calls = await prisma.phoneCall.findMany({
         where: {
-          appUser: {
-            // webUserId: session.user?.webUserId,
-            webUserId: "102926335316336979768",
-          },
           AND: [
             { startDate: { gte: oneWeekAgo } },
             { endDate: { lte: today } },
+            { userId: session.user?.userId },
           ],
         },
       });
@@ -49,13 +46,10 @@ export async function GET(
       fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
       const calls = await prisma.phoneCall.findMany({
         where: {
-          appUser: {
-            // webUserId: session.user?.webUserId,
-            webUserId: "102926335316336979768",
-          },
           AND: [
             { startDate: { gte: fourWeeksAgo } },
             { endDate: { lte: today } },
+            { userId: session.user?.userId },
           ],
         },
       });
@@ -68,13 +62,10 @@ export async function GET(
       const users = await prisma.appUser.findMany();
       const calls = await prisma.phoneCall.findMany({
         where: {
-          appUser: {
-            // webUserId: session.user?.webUserId,
-            webUserId: "102926335316336979768",
-          },
           AND: [
             { startDate: { gte: twelveMonthsAgo } },
             { endDate: { lte: today } },
+            { userId: session.user?.userId },
           ],
         },
       });
