@@ -8,7 +8,7 @@ import { FaFolder } from "react-icons/fa";
 export interface NavigationBarItem {
   icon: ElementType;
   iconActive: ElementType;
-  label: "Home" | "Messages" | "Folders";
+  label: "סטטיסטקות" | "הודעות" | "תיקיות";
   href: string;
 }
 
@@ -19,19 +19,19 @@ export const BottomBarItems: NavigationBarItem[] = [
   {
     icon: () => <Home className={className} />,
     iconActive: () => <HomeActive className={classNameActive} />,
-    label: "Home",
+    label: "סטטיסטקות",
     href: "/home",
   },
   {
     icon: () => <FaRegEnvelope className={className} />,
     iconActive: () => <FaEnvelope className={classNameActive} />,
-    label: "Messages",
+    label: "הודעות",
     href: "/messages",
   },
   {
     icon: () => <FaRegFolder className={className} />,
     iconActive: () => <FaFolder className={classNameActive} />,
-    label: "Folders",
+    label: "תיקיות",
     href: "/folders",
   },
 ];
