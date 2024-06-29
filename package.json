@@ -7,7 +7,8 @@
     "test": "next dev -p 3000 NODE_ENV=test",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "@datadog/browser-logs": "^5.14.0",
