@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Folder, Message } from "@prisma/client";
 import {
   DropdownMenu,
@@ -24,8 +24,47 @@ import { useFormik } from "formik";
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { toast } from "react-toastify";
+import { FolderNoCreatedAt } from "../../../models/folder";
 
 interface MessagePageProps {}
+
+const FoldersDropdown = ({
+  selectedFolderId,
+  onFolderSelected,
+}: {
+  selectedFolderId?: string | null;
+  onFolderSelected: (folderId: string) => void;
+}) => {
+  const { folders } = useAppSelector(selectAuth);
+
+  const selectedFolder = useMemo(
+    () => folders.find(folder => folder.id === selectedFolderId),
+    [selectedFolderId],
+  );
+
+  console.log(folders);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">{selectedFolder?.title || "תיקיות"}</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel dir="rtl">תיקיות</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {folders?.map(folder => (
+          <DropdownMenuItem
+            dir="rtl"
+            key={`folder-${folder.id}`}
+            onClick={() => onFolderSelected(folder.id)}
+          >
+            {folder.title}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 const MessageComponent = ({
   message,
@@ -46,36 +85,66 @@ const MessageComponent = ({
 const EditMessageComponent = ({
   open,
   message,
+  folder,
   onEdit,
+  onDelete,
+  onCreate,
   onClose,
 }: {
   open: boolean;
   message: Omit<Message, "createdAt"> | null;
+  folder: FolderNoCreatedAt | null;
+  onDelete: (messageId: string) => void;
+  onCreate: ({
+    title,
+    shortTitle,
+    body,
+    folderId,
+    position,
+  }: {
+    title: string;
+    shortTitle: string;
+    body: string;
+    folderId: string;
+    position: number;
+  }) => void;
   onEdit: ({
     title,
     shortTitle,
     body,
     position,
+    folderId,
     id,
   }: {
     title: string;
     shortTitle: string;
     body: string;
     position: number;
+    folderId: string;
     id: string;
   }) => void;
   onClose: () => void;
 }) => {
+  const isEdit = useMemo(() => !!message?.title, [message]);
+
   const formik = useFormik({
     initialValues: {
       title: message?.title || "",
       shortTitle: message?.shortTitle || "",
       body: message?.body || "",
+      folderId: folder?.id || "",
       position: message?.position || 0,
     },
     onSubmit: values => {
-      if (!message) return;
-      onEdit({ ...values, id: message.id });
+      if (!values.folderId) {
+        toast.error("נא לבחור תיקיה");
+        return;
+      }
+      if (isEdit && message) {
+        onEdit({ ...values, id: message.id });
+      } else {
+        onCreate(values);
+      }
     },
   });
 
@@ -85,8 +154,9 @@ const EditMessageComponent = ({
       shortTitle: message?.shortTitle || "",
       body: message?.body || "",
       position: message?.position || 0,
+      folderId: folder?.id || "",
     });
-  }, [message]);
+  }, [message, folder]);
 
   return (
     <Dialog
@@ -104,11 +174,19 @@ const EditMessageComponent = ({
           className="flex flex-col gap-4"
           dir="rtl"
         >
+          <FoldersDropdown
+            onFolderSelected={folderId =>
+              formik.setFieldValue("folderId", folderId)
+            }
+            selectedFolderId={formik.values.folderId}
+          />
+
           <Input
             label="כותרת"
             name="title"
             value={formik.values.title}
             onChange={formik.handleChange}
+            required
           />
           <Input
             label="כותרת קצרה"
@@ -116,6 +194,7 @@ const EditMessageComponent = ({
             value={formik.values.shortTitle}
             onChange={formik.handleChange}
             maxLength={3}
+            required
           />
           <Textarea
             label="תוכן"
@@ -123,8 +202,20 @@ const EditMessageComponent = ({
             value={formik.values.body}
             onChange={formik.handleChange}
             rows={10}
+            required
           />
           <Button type="submit">שמור</Button>
+          {isEdit && (
+            <Button
+              variant="link"
+              className="text-destructive"
+              onClick={() => {
+                if (message) onDelete(message.id);
+              }}
+            >
+              מחק
+            </Button>
+          )}
         </form>
       </DialogContent>
     </Dialog>
@@ -132,29 +223,13 @@ const EditMessageComponent = ({
 };
 
 const MessagePage: React.FC<MessagePageProps> = () => {
-  const [loading, setLoading] = useState<boolean>(false);
   const [selectedFolderId, setSelectedFolder] = useState<string>("");
   const [messageToEdit, setMessageToEdit] = useState<Omit<
     Message,
     "createdAt"
   > | null>(null);
-  const { getMessagesData, updateMessage } = useMessage();
-  const { data } = useAppSelector(selectAuth);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      await getMessagesData();
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { updateMessage, createMessage, deleteMessage } = useMessage();
+  const { data, loadingData, folders } = useAppSelector(selectAuth);
 
   useEffect(() => {
     if (!selectedFolderId && data.length) {
@@ -163,21 +238,17 @@ const MessagePage: React.FC<MessagePageProps> = () => {
   }, [data]);
 
   const selectedFolder = useMemo(() => {
-    return data.find(message => message.folder?.id === selectedFolderId);
+    return folders.find(folder => folder?.id === selectedFolderId);
   }, [selectedFolderId]);
 
-  const folders: Folder[] = useMemo(() => {
-    const allFolders = data
-      .map(message => message.folder)
-      .filter(Boolean) as Folder[];
-    const foldersNoDuplicates = allFolders.filter(
-      (folder, index, self) =>
-        index === self.findIndex(t => t.id === folder.id),
-    );
-    return foldersNoDuplicates;
-  }, [data]);
+  const getMessageFolder = useCallback(
+    (messageId: string): FolderNoCreatedAt | null => {
+      return data.find(message => message.id === messageId)?.folder || null;
+    },
+    [data],
+  );
 
-  if (loading)
+  if (loadingData)
     return (
       <Loading
         spinnerClassName="w-20 h-20"
@@ -187,24 +258,10 @@ const MessagePage: React.FC<MessagePageProps> = () => {
 
   return (
     <div className="h-full w-full flex flex-col gap-4" dir="rtl">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">{selectedFolder?.title || "תיקיות"}</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel dir="rtl">תיקיות</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {folders?.map(folder => (
-            <DropdownMenuItem
-              dir="rtl"
-              key={`folder-${folder.id}`}
-              onClick={() => setSelectedFolder(folder.id)}
-            >
-              {folder.title}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <FoldersDropdown
+        onFolderSelected={setSelectedFolder}
+        selectedFolderId={selectedFolder?.id}
+      />
       <div className="flex flex-wrap gap-4" dir="rtl">
         {data
           .filter(message => message?.folder?.id === selectedFolderId)
@@ -216,13 +273,33 @@ const MessagePage: React.FC<MessagePageProps> = () => {
             />
           ))}
       </div>
+      <Button variant="secondary" onClick={() => setMessageToEdit({} as any)}>
+        הוסף הודעה
+      </Button>
       <EditMessageComponent
         open={!!messageToEdit}
         message={messageToEdit}
-        onEdit={message => {
-          const { id, ...data } = message;
+        onDelete={messageId => {
           try {
-            updateMessage(data, id);
+            deleteMessage(messageId);
+            setMessageToEdit(null);
+          } catch (error: any) {
+            toast.error("שגיאה במחיקת ההודעה");
+          }
+        }}
+        onCreate={({ folderId, ...message }) => {
+          try {
+            createMessage(message, folderId);
+            setMessageToEdit(null);
+          } catch (error: any) {
+            toast.error("שגיאה ביצירת ההודעה");
+          }
+        }}
+        folder={selectedFolder || null}
+        onEdit={message => {
+          const { id, folderId, ...data } = message;
+          try {
+            updateMessage(data, id, folderId);
             setMessageToEdit(null);
           } catch (error: any) {
             toast.error("שגיאה בעדכון ההודעה");

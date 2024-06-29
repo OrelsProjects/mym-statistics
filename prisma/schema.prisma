@@ -68,7 +68,6 @@ model Folder {
 
 model Message {
   id           String   @id @default(uuid())
-  oldMessageId String?  @map("old_message_id")
   userId       String   @map("user_id")
   title        String
   shortTitle   String   @map("short_title")
@@ -104,8 +103,6 @@ model MessageInFolder {
 
   userIdMessage String? @map("user_id_message")
   userIdFolder  String? @map("user_id_folder")
-  oldFolderId   String? @map("old_folder_id")
-  oldMessageId  String? @map("old_message_id")
 
   message Message? @relation(fields: [messageId], references: [id])
   folder  Folder?  @relation(fields: [folderId], references: [id])

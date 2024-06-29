@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
 import _ from "lodash";
-import {
-  MessageWithFolder,
-  MessageWithNestedFolders,
-} from "../../../models/message";
-import { AppUser } from "@prisma/client";
+import { MessageWithFolder } from "../../../models/message";
+import { AppUser, Folder } from "@prisma/client";
+import { FolderNoCreatedAt } from "../../../models/folder";
 
 export type AuthStateType =
   | "anonymous"
@@ -21,6 +19,7 @@ export interface AuthState {
   loadingData?: boolean;
   error: string | null;
   data: MessageWithFolder[];
+  folders: FolderNoCreatedAt[];
   isDataFetched?: boolean;
 }
 
@@ -32,6 +31,7 @@ export const initialState: AuthState = {
   loadingData: false,
   error: null,
   data: [],
+  folders: [],
   isDataFetched: false,
 };
 
@@ -75,11 +75,35 @@ const authSlice = createSlice({
       state.isDataFetched = true;
       state.loadingData = false;
     },
+    setFolders: (state, action: PayloadAction<FolderNoCreatedAt[]>) => {
+      state.folders = action.payload;
+    },
+    updateFolder: (
+      state,
+      action: PayloadAction<{ folderId: string; folder: FolderNoCreatedAt }>,
+    ) => {
+      state.folders = state.folders.map(folder =>
+        folder.id === action.payload.folderId
+          ? { ...folder, ...action.payload.folder }
+          : folder,
+      );
+      state.data = state.data.map(message =>
+        message.folder?.id === action.payload.folderId
+          ? { ...message, folder: action.payload.folder }
+          : message,
+      );
+    },
   },
 });
 
-export const { setUser, setError, clearUser, setUserData, setLoadingData } =
-  authSlice.actions;
+export const {
+  setUser,
+  setError,
+  clearUser,
+  setUserData,
+  setLoadingData,
+  setFolders,
+} = authSlice.actions;
 
 export const selectAuth = (state: RootState): AuthState => state.auth;
 

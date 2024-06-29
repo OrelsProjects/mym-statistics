@@ -1,11 +1,14 @@
 import { ElementType } from "react";
 import { GoHomeFill as HomeActive, GoHome as Home } from "react-icons/go";
-import { FaEnvelope } from "react-icons/fa";
+import { FaRegEnvelope } from "react-icons/fa";
+import { FaEnvelope } from "react-icons/fa6";
+import { FaRegFolder } from "react-icons/fa6";
+import { FaFolder } from "react-icons/fa";
 
 export interface NavigationBarItem {
   icon: ElementType;
   iconActive: ElementType;
-  label: "Home" | "Messages";
+  label: "Home" | "Messages" | "Folders";
   href: string;
 }
 
@@ -20,9 +23,15 @@ export const BottomBarItems: NavigationBarItem[] = [
     href: "/home",
   },
   {
-    icon: () => <FaEnvelope className={className} />,
+    icon: () => <FaRegEnvelope className={className} />,
     iconActive: () => <FaEnvelope className={classNameActive} />,
     label: "Messages",
     href: "/messages",
+  },
+  {
+    icon: () => <FaRegFolder className={className} />,
+    iconActive: () => <FaFolder className={classNameActive} />,
+    label: "Folders",
+    href: "/folders",
   },
 ];

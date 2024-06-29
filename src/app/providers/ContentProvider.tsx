@@ -10,6 +10,7 @@ import SettingsComponent from "../../components/settingsContainer";
 import { useAppSelector } from "../../lib/hooks/redux";
 import { cn } from "../../lib/utils";
 import { useTheme } from "next-themes";
+import useMessage from "../../lib/hooks/useMessage";
 
 interface ContentProviderProps {
   children: React.ReactNode;
@@ -18,7 +19,8 @@ interface ContentProviderProps {
 const BOTTOM_BAR_HEIGHT = 65;
 
 const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
-  const { user, state } = useAppSelector(state => state.auth);
+  const { user } = useAppSelector(state => state.auth);
+  const { getMessagesData } = useMessage();
   const { theme } = useTheme();
   const sizeContent = React.useContext(SizeContext);
   const bottomBarRef = React.useRef<HTMLDivElement>(null);
@@ -26,6 +28,18 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
     sizeContent.height,
   );
   ("use client");
+
+  const fetchData = async () => {
+    try {
+      await getMessagesData();
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchData();
+  }, []);
 
   React.useEffect(() => {
     if (bottomBarRef.current) {

@@ -18,15 +18,30 @@ export async function GET(req: NextRequest): Promise<any> {
           appUser: {
             webUserId: session.user?.webUserId,
           },
+          isActive: true,
         },
         include: {
           messagesInFolder: {
-            include: { folder: true },
+            include: {
+              folder: {
+                where: { isActive: true },
+              },
+            },
           },
         },
       });
-
-    return NextResponse.json(userMessages, { status: 200 });
+    const userFolders = await prisma.folder.findMany({
+      where: {
+        appUser: {
+          webUserId: session.user?.webUserId,
+        },
+        isActive: true,
+      },
+    });
+    return NextResponse.json(
+      { data: userMessages, folders: userFolders },
+      { status: 200 },
+    );
   } catch (error: any) {
     Logger.error(
       "Error getting user messages",

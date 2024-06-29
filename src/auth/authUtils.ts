@@ -32,7 +32,19 @@ export const getSession = async ({
     session.user.webUserId = token.sub!;
   }
 
-  return session;
+  const appUser = await prisma.appUser.findFirst({
+    where: {
+      webUserId: token.sub!,
+    },
+  });
+
+  return {
+    ...session,
+    user: {
+      ...session.user,
+      userId: appUser?.id,
+    },
+  };
 };
 
 export const signIn = async (session: any) => {

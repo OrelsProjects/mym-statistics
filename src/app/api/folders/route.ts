@@ -3,33 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../../auth/authOptions";
 import prisma from "../_db/db";
 import Logger from "../../../loggerServer";
-import { Message } from "@prisma/client";
-import { CreateMessage } from "../../../models/message";
-
-export async function GET(req: NextRequest): Promise<any> {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const userMessages = await prisma.message.findMany({
-      where: {
-        id: session.user?.userId,
-      },
-    });
-    return NextResponse.json(userMessages, { status: 200 });
-  } catch (error: any) {
-    Logger.error(
-      "Error getting user messages",
-      session.user?.userId || "unknown",
-      {
-        error,
-      },
-    );
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
+import { CreateFolder } from "../../../models/folder";
+import { Folder } from "@prisma/client";
 
 export async function POST(req: NextRequest): Promise<any> {
   const session = await getServerSession(authOptions);
@@ -37,27 +12,20 @@ export async function POST(req: NextRequest): Promise<any> {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    const { message, folderId }: { message: CreateMessage; folderId: string } =
-      await req.json();
-    if (!message || !folderId) {
+    const { folder }: { folder: CreateFolder } = await req.json();
+    if (!folder) {
       return NextResponse.json(
         { error: "Message or folder not found" },
         { status: 404 },
       );
     }
-    const newMessage = await prisma.message.create({
+    const newMessage = await prisma.folder.create({
       data: {
-        ...message,
+        ...folder,
         createdAt: new Date(),
         isActive: true,
         timesUsed: 0,
         userId: session.user.userId,
-      },
-    });
-    await prisma.messageInFolder.create({
-      data: {
-        folderId: folderId,
-        messageId: newMessage.id,
       },
     });
     return NextResponse.json({ ...newMessage }, { status: 200 });
@@ -83,7 +51,7 @@ export async function DELETE(req: NextRequest): Promise<any> {
     if (!id) {
       return NextResponse.json({ error: "Message not found" }, { status: 404 });
     }
-    await prisma.message.update({
+    await prisma.folder.update({
       where: { id },
       data: { isActive: false },
     });
@@ -101,29 +69,14 @@ export async function PATCH(req: NextRequest): Promise<any> {
   }
   try {
     const data: {
-      message: Partial<Message>;
-      messageId: string;
-      folderId: string;
+      folder: Partial<Folder>;
     } = await req.json();
-    await prisma.message.update({
+    await prisma.folder.update({
       where: {
-        id: data.messageId,
+        id: data.folder.id,
       },
       data: {
-        ...data.message,
-        isActive: true,
-      },
-    });
-    await prisma.messageInFolder.update({
-      where: {
-        messageId_folderId: {
-          messageId: data.messageId,
-          folderId: data.folderId,
-        },
-      },
-      data: {
-        folderId: data.folderId,
-        messageId: data.messageId,
+        ...data.folder,
       },
     });
     return NextResponse.json({}, { status: 200 });
