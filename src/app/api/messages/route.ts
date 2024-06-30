@@ -104,6 +104,7 @@ export async function PATCH(req: NextRequest): Promise<any> {
       message: Partial<Message>;
       messageId: string;
       folderId: string;
+      oldFolderId?: string;
     } = await req.json();
     await prisma.message.update({
       where: {
@@ -114,18 +115,20 @@ export async function PATCH(req: NextRequest): Promise<any> {
         isActive: true,
       },
     });
-    await prisma.messageInFolder.update({
-      where: {
-        messageId_folderId: {
-          messageId: data.messageId,
-          folderId: data.folderId,
+    if (data.oldFolderId && data.folderId !== data.oldFolderId) {
+      await prisma.messageInFolder.update({
+        where: {
+          messageId_folderId: {
+            messageId: data.messageId,
+            folderId: data.oldFolderId,
+          },
         },
-      },
-      data: {
-        folderId: data.folderId,
-        messageId: data.messageId,
-      },
-    });
+        data: {
+          folderId: data.folderId,
+          messageId: data.messageId,
+        },
+      });
+    }
     return NextResponse.json({}, { status: 200 });
   } catch (error: any) {
     Logger.error("Error updating message", session.user?.userId, { error });

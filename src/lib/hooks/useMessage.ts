@@ -59,18 +59,20 @@ export default function useMessage() {
     message: Partial<Message>,
     messageId: string,
     folderId: string,
+    oldFolderId?: string,
   ) => {
     // api/messages patch
     const oldData = [...data];
     const optimisticUpdate = (message: Partial<Message>) => {
+      const newFolder = folders.find(folder => folder.id === folderId) || null;
       const newData = data.map(d =>
-        d.id === messageId ? { ...d, ...message } : d,
+        d.id === messageId ? { ...d, ...message, folder: newFolder } : d,
       );
       dispatch(setUserData(newData));
     };
     optimisticUpdate(message);
     try {
-      await axios.patch(`api/messages`, { message, messageId, folderId });
+      await axios.patch(`api/messages`, { message, messageId, folderId, oldFolderId });
     } catch (error: any) {
       console.error(error);
       dispatch(setUserData(oldData));

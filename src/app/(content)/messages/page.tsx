@@ -115,6 +115,7 @@ const EditMessageComponent = ({
     position,
     folderId,
     id,
+    oldFolderId,
   }: {
     title: string;
     shortTitle: string;
@@ -122,6 +123,7 @@ const EditMessageComponent = ({
     position: number;
     folderId: string;
     id: string;
+    oldFolderId?: string;
   }) => void;
   onClose: () => void;
 }) => {
@@ -134,6 +136,7 @@ const EditMessageComponent = ({
       body: message?.body || "",
       folderId: folder?.id || "",
       position: message?.position || 0,
+      oldFolderId: folder?.id,
     },
     onSubmit: values => {
       if (!values.folderId) {
@@ -141,7 +144,7 @@ const EditMessageComponent = ({
         return;
       }
       if (isEdit && message) {
-        onEdit({ ...values, id: message.id });
+        onEdit({ ...values, id: message.id, oldFolderId: values.oldFolderId });
       } else {
         onCreate(values);
       }
@@ -155,6 +158,7 @@ const EditMessageComponent = ({
       body: message?.body || "",
       position: message?.position || 0,
       folderId: folder?.id || "",
+      oldFolderId: folder?.id || "",
     });
   }, [message, folder]);
 
@@ -297,9 +301,9 @@ const MessagePage: React.FC<MessagePageProps> = () => {
         }}
         folder={selectedFolder || null}
         onEdit={message => {
-          const { id, folderId, ...data } = message;
+          const { id, folderId, oldFolderId, ...data } = message;
           try {
-            updateMessage(data, id, folderId);
+            updateMessage(data, id, folderId, oldFolderId);
             setMessageToEdit(null);
           } catch (error: any) {
             toast.error("שגיאה בעדכון ההודעה");
