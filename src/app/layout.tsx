@@ -55,7 +55,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" className="font-montserrat">
+    <html lang="en" className="font-montserrat" dir="rtl">
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
