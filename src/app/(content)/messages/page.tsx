@@ -165,7 +165,7 @@ const EditMessageComponent = ({
         if (!value) onClose();
       }}
     >
-      <DialogContent>
+      <DialogContent closeOnOutsideClick={false}>
         <DialogTitle dir="rtl" className="mt-8">
           עריכת הודעה
         </DialogTitle>
