@@ -143,10 +143,15 @@ const EditMessageComponent = ({
         toast.error("נא לבחור תיקיה");
         return;
       }
+      const { oldFolderId, ...messageNoOldFolderId } = values;
       if (isEdit && message) {
-        onEdit({ ...values, id: message.id, oldFolderId: values.oldFolderId });
+        onEdit({
+          ...messageNoOldFolderId,
+          id: message.id,
+          oldFolderId: values.oldFolderId,
+        });
       } else {
-        onCreate(values);
+        onCreate(messageNoOldFolderId);
       }
     },
   });
@@ -244,13 +249,6 @@ const MessagePage: React.FC<MessagePageProps> = () => {
   const selectedFolder = useMemo(() => {
     return folders.find(folder => folder?.id === selectedFolderId);
   }, [selectedFolderId]);
-
-  const getMessageFolder = useCallback(
-    (messageId: string): FolderNoCreatedAt | null => {
-      return data.find(message => message.id === messageId)?.folder || null;
-    },
-    [data],
-  );
 
   if (loadingData)
     return (
