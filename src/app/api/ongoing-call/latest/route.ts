@@ -60,7 +60,7 @@ export async function GET(req: NextRequest): Promise<any> {
 
     const callStartDate = new Date(latestPhoneCall.startDate).getTime();
     const ongoingCallCreatedAt = new Date(ongoingCall.createdAt).getTime();
-    const marginOfErrorSeconds = 2000;
+    const marginOfErrorSeconds = 10000;
 
     if (callStartDate < ongoingCallCreatedAt - marginOfErrorSeconds) {
       // the call is ongoing
