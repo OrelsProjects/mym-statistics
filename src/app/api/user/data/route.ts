@@ -23,13 +23,20 @@ export async function GET(req: NextRequest): Promise<any> {
         include: {
           messagesInFolder: {
             include: {
-              folder: {
-                where: { isActive: true },
-              },
+              folder: true,
             },
           },
         },
       });
+
+    // remove folders that are not active
+    userMessages = userMessages.map(message => {
+      message.messagesInFolder = message.messagesInFolder.filter(
+        messageInFolder => messageInFolder.folder?.isActive,
+      );
+      return message;
+    });
+
     const userFolders = await prisma.folder.findMany({
       where: {
         appUser: {

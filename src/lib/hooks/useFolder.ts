@@ -52,7 +52,7 @@ export default function useFolder() {
       console.error(error);
       dispatch(setFolders(oldData));
       throw error;
-    }
+    } 
   };
 
   const deleteFolder = async (folderId: string) => {

@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/auth/authSlice";
+import ongoingCallReducer from "./features/ongoingCall/ongoingCallSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       auth: authReducer,
+      ongoingCall: ongoingCallReducer,
     },
   });
 };

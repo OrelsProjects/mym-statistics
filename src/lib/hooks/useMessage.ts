@@ -24,35 +24,42 @@ export default function useMessage() {
       return;
     }
     dispatch(setLoadingData(true));
-    const response = await axios.get<{
-      data: MessageWithNestedFolders[];
-      folders: Folder[];
-    }>("api/user/data");
+    try {
+      const response = await axios.get<{
+        data: MessageWithNestedFolders[];
+        folders: Folder[];
+      }>("api/user/data");
 
-    const data: MessageWithFolder[] = response.data.data.map(
-      messageWithNestedFolder => {
-        const folder = messageWithNestedFolder.messagesInFolder.filter(
-          mif => mif.messageId === messageWithNestedFolder.id,
-        )?.[0]?.folder;
+      const data: MessageWithFolder[] = response.data.data.map(
+        messageWithNestedFolder => {
+          const folder = messageWithNestedFolder.messagesInFolder.filter(
+            mif => mif.messageId === messageWithNestedFolder.id,
+          )?.[0]?.folder;
 
-        let folderNoCreatedAt: Omit<Folder, "createdAt"> | null = null;
-        if (folder) {
-          const { createdAt: createdAtFolder, ...rest } = folder;
-          folderNoCreatedAt = rest;
-        }
+          let folderNoCreatedAt: Omit<Folder, "createdAt"> | null = null;
+          if (folder) {
+            const { createdAt: createdAtFolder, ...rest } = folder;
+            folderNoCreatedAt = rest;
+          }
 
-        const { messagesInFolder, ...message } = messageWithNestedFolder;
-        const { createdAt: createdAtMessage, ...messageNoCreatedAt } = message;
+          const { messagesInFolder, ...message } = messageWithNestedFolder;
+          const { createdAt: createdAtMessage, ...messageNoCreatedAt } =
+            message;
 
-        return {
-          ...message,
-          folder: folderNoCreatedAt,
-        };
-      },
-    );
+          return {
+            ...message,
+            folder: folderNoCreatedAt,
+          };
+        },
+      );
 
-    dispatch(setUserData(data));
-    dispatch(setFolders(response.data.folders));
+      dispatch(setUserData(data));
+      dispatch(setFolders(response.data.folders));
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      dispatch(setLoadingData(false));
+    }
   };
 
   const updateMessage = async (
@@ -72,7 +79,12 @@ export default function useMessage() {
     };
     optimisticUpdate(message);
     try {
-      await axios.patch(`api/messages`, { message, messageId, folderId, oldFolderId });
+      await axios.patch(`api/messages`, {
+        message,
+        messageId,
+        folderId,
+        oldFolderId,
+      });
     } catch (error: any) {
       console.error(error);
       dispatch(setUserData(oldData));

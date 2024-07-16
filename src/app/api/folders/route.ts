@@ -70,10 +70,11 @@ export async function PATCH(req: NextRequest): Promise<any> {
   try {
     const data: {
       folder: Partial<Folder>;
+      folderId: string;
     } = await req.json();
     await prisma.folder.update({
       where: {
-        id: data.folder.id,
+        id: data.folderId,
       },
       data: {
         ...data.folder,

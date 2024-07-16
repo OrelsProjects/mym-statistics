@@ -10,6 +10,7 @@ import TopLoaderProvider from "../providers/TopLoaderProvider";
 import AnimationProvider from "../providers/AnimationProvider";
 import HeightProvider from "../providers/HeightProvider";
 import ContentProvider from "../providers/ContentProvider";
+import { OngoingCallProvider } from "../providers/OngoingCallProvider";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -20,12 +21,13 @@ export default function ContentLayout({ children }: RootLayoutProps) {
     <main>
       <AuthProvider>
         <NotificationsProvider />
-          <HeightProvider>
-            <ContentProvider>
-              <TopLoaderProvider />
-              <AnimationProvider>{children}</AnimationProvider>
-            </ContentProvider>
-          </HeightProvider>
+        <HeightProvider>
+          <ContentProvider>
+            <TopLoaderProvider />
+            <OngoingCallProvider />
+            <AnimationProvider>{children}</AnimationProvider>
+          </ContentProvider>
+        </HeightProvider>
       </AuthProvider>
     </main>
   );

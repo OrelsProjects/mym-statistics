@@ -59,7 +59,7 @@ export async function GET(
       const today = new Date();
       const twelveMonthsAgo = new Date();
       twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-      const users = await prisma.appUser.findMany();
+
       const calls = await prisma.phoneCall.findMany({
         where: {
           AND: [

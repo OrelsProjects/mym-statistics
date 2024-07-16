@@ -106,6 +106,7 @@ export async function PATCH(req: NextRequest): Promise<any> {
       folderId: string;
       oldFolderId?: string;
     } = await req.json();
+    
     await prisma.message.update({
       where: {
         id: data.messageId,
