@@ -6,10 +6,12 @@ import { collection, onSnapshot } from "firebase/firestore";
 import usePhonecall from "../../lib/hooks/usePhonecall";
 import Loading from "../../components/ui/loading";
 import { db } from "../../../firebase.config";
-import { useAppSelector } from "../../lib/hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../lib/hooks/redux";
 import { selectAuth } from "../../lib/features/auth/authSlice";
+import { setOngoingCall } from "../../lib/features/ongoingCall/ongoingCallSlice";
 
 export function OngoingCallProvider() {
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector(selectAuth);
   const { loading, ongoingCall } = useAppSelector(state => state.ongoingCall);
   const { getLatestOngoingCall } = usePhonecall();
@@ -29,17 +31,15 @@ export function OngoingCallProvider() {
       console.log("subscribing to ongoing calls with userId", user.id);
       const unsubscribe = onSnapshot(
         collection(db, "users", user.id, "ongoingCalls"),
-        async _ => {
-          console.log("ongoing call updated");
-          if (ongoingCall) {
-            // wait 10 seconds before fetching the latest ongoing call
-            console.log(
-              "waiting 10 seconds before fetching the latest ongoing call",
-            );
-            await new Promise(resolve => setTimeout(resolve, 10000));
-            console.log("fetching the latest ongoing call");
+        async doc => {
+          const latestOngoingCall = doc.docChanges()?.[0]?.doc?.data();
+          if (latestOngoingCall.endDate) {
+            console.log("latest ongoing call has ended", latestOngoingCall);
+            dispatch(setOngoingCall(undefined));
+          } else {
+            console.log("latest ongoing call", latestOngoingCall);
+            dispatch(setOngoingCall(latestOngoingCall));
           }
-          await getLatestOngoingCall();
         },
       );
 
