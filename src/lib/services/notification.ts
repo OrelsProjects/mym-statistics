@@ -1,5 +1,5 @@
 "use client";
-import { getUserToken } from "../../../firebase.config";
+// import { getUserToken } from "../../../firebase.config";
 
 function isNotificationSupported() {
   return "Notification" in window;
@@ -71,8 +71,8 @@ export async function getToken(): Promise<string | undefined> {
     return ""; // TODO: Throw
   }
 
-  const token = await getUserToken();
+  // const token = await getUserToken();
 
-  console.log(token);
-  return token;
+  // console.log(token);
+  // return token;
 }

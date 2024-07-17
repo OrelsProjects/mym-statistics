@@ -48,8 +48,8 @@ export default function usePhonecall() {
   }
 
   return {
-    ongoingCall,
     loading,
+    ongoingCall,
     getLatestOngoingCall,
     updateOngoingCall,
     sendWhatsapp,

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { messaging } from "../../../firebase.config";
+// import { messaging } from "../../../firebase.config";
 import { Messaging, onMessage } from "firebase/messaging";
 import { useAppSelector } from "../../lib/hooks/redux";
 import { NotificationType } from "../../models/notification";
@@ -27,7 +27,7 @@ const NotificationsProvider = () => {
     // if (messaging && user?.settings.showNotifications) {
     //   init(messaging);
     // }
-  }, [user, messaging]);
+  }, [user]);
 
   return <></>;
 };

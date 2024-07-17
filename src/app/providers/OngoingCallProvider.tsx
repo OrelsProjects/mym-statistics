@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { IoIosRefresh } from "react-icons/io";
-import { doc, collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import usePhonecall from "../../lib/hooks/usePhonecall";
 import Loading from "../../components/ui/loading";
 import { db } from "../../../firebase.config";

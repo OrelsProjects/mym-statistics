@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "react-toastify";
-import { getUserToken, initMessaging } from "../../../firebase.config";
+// import { getUserToken, initMessaging } from "../../../firebase.config";
 import { Logger } from "../../logger";
 import { canUseNotifications, isMobilePhone } from "../utils/notificationUtils";
 import { NotificationData } from "../../models/notification";
@@ -35,7 +35,7 @@ export default function useNotification() {
     if (isPermissionGranted()) {
       return true;
     } else {
-      initMessaging();
+      // initMessaging();
       const permissionResponse = await Notification.requestPermission();
       return permissionResponse === "granted";
     }
@@ -50,13 +50,13 @@ export default function useNotification() {
     }
     let pushToken = "";
     try {
-      initMessaging();
-      pushToken = (await getUserToken()) || "no-token";
-      if (isMobilePhone()) {
-        await axios.patch("/api/user", { pushTokenMobile: pushToken });
-      } else {
-        await axios.patch("/api/user", { pushToken });
-      }
+      // initMessaging();
+      // pushToken = (await getUserToken()) || "no-token";
+      // if (isMobilePhone()) {
+      //   await axios.patch("/api/user", { pushTokenMobile: pushToken });
+      // } else {
+      //   await axios.patch("/api/user", { pushToken });
+      // }
     } catch (e: any) {
       Logger.error("Failed to get token", {
         data: {
