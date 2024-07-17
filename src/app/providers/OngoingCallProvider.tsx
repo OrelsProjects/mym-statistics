@@ -11,7 +11,8 @@ import { selectAuth } from "../../lib/features/auth/authSlice";
 
 export function OngoingCallProvider() {
   const { user } = useAppSelector(selectAuth);
-  const { ongoingCall, loading, getLatestOngoingCall } = usePhonecall();
+  const { loading } = useAppSelector(state => state.ongoingCall);
+  const { ongoingCall, getLatestOngoingCall } = usePhonecall();
 
   React.useEffect(() => {
     try {
@@ -23,10 +24,13 @@ export function OngoingCallProvider() {
 
   React.useEffect(() => {
     let unsubscribe: () => void = () => {};
+    console.log("about to subscribe to ongoing calls");
     if (db && user) {
+      console.log("subscribing to ongoing calls with userId", user.id);
       const unsubscribe = onSnapshot(
         collection(db, "users", user.id, "ongoingCalls"),
         async _ => {
+          console.log("ongoing call updated");
           await getLatestOngoingCall();
         },
       );
