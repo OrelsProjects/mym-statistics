@@ -11,8 +11,8 @@ import { selectAuth } from "../../lib/features/auth/authSlice";
 
 export function OngoingCallProvider() {
   const { user } = useAppSelector(selectAuth);
-  const { loading } = useAppSelector(state => state.ongoingCall);
-  const { ongoingCall, getLatestOngoingCall } = usePhonecall();
+  const { loading, ongoingCall } = useAppSelector(state => state.ongoingCall);
+  const { getLatestOngoingCall } = usePhonecall();
 
   React.useEffect(() => {
     try {
@@ -30,7 +30,10 @@ export function OngoingCallProvider() {
       const unsubscribe = onSnapshot(
         collection(db, "users", user.id, "ongoingCalls"),
         async _ => {
-          console.log("ongoing call updated");
+          if (ongoingCall) {
+            // wait 10 seconds before fetching the latest ongoing call
+            await new Promise(resolve => setTimeout(resolve, 10000));
+          }
           await getLatestOngoingCall();
         },
       );
