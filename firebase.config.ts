@@ -2,9 +2,7 @@
 
 import firebase from "firebase/compat/app";
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { Messaging, getMessaging, getToken } from "firebase/messaging";
-import { canUseNotifications } from "./src/lib/utils/notificationUtils";
-
+import { Firestore, getFirestore } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -14,41 +12,16 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
-// if app is not initialized, initialize it
+let db: Firestore | null = null;
 let app: FirebaseApp | null =
   firebase.apps.length > 0 ? firebase.apps?.[0] : null;
-let messaging: Messaging | null = null;
 
 if (typeof window !== "undefined") {
   app = !firebase.apps.length ? initializeApp(firebaseConfig) : firebase.app();
 }
-// If notifications are enabled, initialize messaging
+
 if (app) {
-  if (canUseNotifications()) {
-    if (Notification.permission === "granted") {
-      try {
-        messaging = getMessaging(app);
-      } catch (error: any) {}
-    }
-  }
+  db = getFirestore(app);
 }
 
-const initMessaging = () => {
-  if (!app || messaging) return;
-  messaging = getMessaging(app);
-};
-
-const getUserToken = async () => {
-  if (!messaging) return;
-  try {
-    const token = await getToken(messaging, {
-      vapidKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-    });
-    return token;
-  } catch (error: any) {
-    console.error("An error occurred while retrieving token. ", error);
-    return "an error: " + error.message;
-  }
-};
-
-export { app, messaging, initMessaging, getUserToken };
+export { db };

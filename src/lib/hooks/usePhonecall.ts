@@ -1,22 +1,20 @@
 import { OngoingCall } from "@prisma/client";
 import axios from "axios";
-import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "./redux";
 import {
   selectOngoingCall,
+  setLoading,
   setOngoingCall,
 } from "../features/ongoingCall/ongoingCallSlice";
 
 export default function usePhonecall() {
   const dispatch = useAppDispatch();
-  const { ongoingCall } = useAppSelector(selectOngoingCall);
-
-  const [loading, setLoading] = useState(false);
+  const { ongoingCall, loading } = useAppSelector(selectOngoingCall);
 
   async function getLatestOngoingCall() {
     if (loading) return;
     try {
-      setLoading(true);
+      dispatch(setLoading(true));
       const result = await axios.get<{
         diff: number;
         ongoingCall?: Partial<OngoingCall>;
@@ -26,7 +24,7 @@ export default function usePhonecall() {
       console.error("Error getting latest ongoing call", error);
       throw error;
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false));
     }
   }
 
@@ -45,5 +43,15 @@ export default function usePhonecall() {
     }
   }
 
-  return { ongoingCall, loading, getLatestOngoingCall, sendWhatsapp };
+  function updateOngoingCall(call: Partial<OngoingCall>) {
+    dispatch(setOngoingCall(call));
+  }
+
+  return {
+    ongoingCall,
+    loading,
+    getLatestOngoingCall,
+    updateOngoingCall,
+    sendWhatsapp,
+  };
 }

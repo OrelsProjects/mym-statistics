@@ -4,10 +4,12 @@ import { OngoingCall } from "@prisma/client";
 
 interface OngoingCallState {
   ongoingCall: Partial<OngoingCall> | undefined;
+  loading: boolean;
 }
 
 export const initialState: OngoingCallState = {
   ongoingCall: undefined,
+  loading: false,
 };
 
 const ongoingCallSlice = createSlice({
@@ -20,10 +22,13 @@ const ongoingCallSlice = createSlice({
     ) => {
       state.ongoingCall = action.payload;
     },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
   },
 });
 
-export const { setOngoingCall } = ongoingCallSlice.actions;
+export const { setOngoingCall, setLoading } = ongoingCallSlice.actions;
 
 export const selectOngoingCall = (state: RootState): OngoingCallState =>
   state.ongoingCall;
