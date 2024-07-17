@@ -30,9 +30,14 @@ export function OngoingCallProvider() {
       const unsubscribe = onSnapshot(
         collection(db, "users", user.id, "ongoingCalls"),
         async _ => {
+          console.log("ongoing call updated");
           if (ongoingCall) {
             // wait 10 seconds before fetching the latest ongoing call
+            console.log(
+              "waiting 10 seconds before fetching the latest ongoing call",
+            );
             await new Promise(resolve => setTimeout(resolve, 10000));
+            console.log("fetching the latest ongoing call");
           }
           await getLatestOngoingCall();
         },
