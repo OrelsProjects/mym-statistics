@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAppDispatch, useAppSelector } from "./redux";
 import {
   selectOngoingCall,
+  setIsInit,
   setLoading,
   setOngoingCall,
 } from "../features/ongoingCall/ongoingCallSlice";
@@ -25,6 +26,7 @@ export default function usePhonecall() {
       throw error;
     } finally {
       dispatch(setLoading(false));
+      dispatch(setIsInit(true));
     }
   }
 

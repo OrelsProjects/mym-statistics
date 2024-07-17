@@ -13,7 +13,9 @@ import { setOngoingCall } from "../../lib/features/ongoingCall/ongoingCallSlice"
 export function OngoingCallProvider() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector(selectAuth);
-  const { loading, ongoingCall } = useAppSelector(state => state.ongoingCall);
+  const { loading, ongoingCall, isInit } = useAppSelector(
+    state => state.ongoingCall,
+  );
   const { getLatestOngoingCall } = usePhonecall();
 
   React.useEffect(() => {
@@ -26,32 +28,28 @@ export function OngoingCallProvider() {
 
   React.useEffect(() => {
     let unsubscribe: () => void = () => {};
-    console.log("about to subscribe to ongoing calls");
     if (db && user) {
-      console.log("subscribing to ongoing calls with userId", user.id);
-      const unsubscribe = onSnapshot(
+      unsubscribe = onSnapshot(
         collection(db, "users", user.id, "ongoingCalls"),
         async doc => {
+          if (!isInit) {
+            await getLatestOngoingCall();
+            return;
+          }
           const latestOngoingCall = doc.docChanges()?.[0]?.doc?.data();
           if (latestOngoingCall.endDate) {
-            console.log("latest ongoing call has ended", latestOngoingCall);
             dispatch(setOngoingCall(undefined));
           } else {
-            console.log("latest ongoing call", latestOngoingCall);
             dispatch(setOngoingCall(latestOngoingCall));
           }
         },
       );
-
-      return () => {
-        unsubscribe();
-      };
     }
 
     return () => {
       unsubscribe();
     };
-  }, [db, user]);
+  }, [db, user, isInit]);
 
   return (
     <div className="w-full absolute top-0 flex flex-row justify-center items-center gap-2">
