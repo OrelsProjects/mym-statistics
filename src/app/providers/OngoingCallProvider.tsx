@@ -53,16 +53,12 @@ export function OngoingCallProvider() {
 
   return (
     <div className="w-full absolute top-0 flex flex-row justify-center items-center gap-2">
-      {ongoingCall
-        ? ongoingCall.contactName || ongoingCall.number
-        : "אין שיחה פעילה"}
       {loading ? (
         <Loading spinnerClassName="w-5 h-5 fill-foreground" />
+      ) : ongoingCall ? (
+        ongoingCall.contactName || ongoingCall.number
       ) : (
-        <IoIosRefresh
-          className="cursor-pointer w-5 h-5"
-          onClick={getLatestOngoingCall}
-        />
+        "אין שיחה פעילה"
       )}
     </div>
   );
