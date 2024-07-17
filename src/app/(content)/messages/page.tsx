@@ -25,6 +25,7 @@ import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { toast } from "react-toastify";
 import { FolderNoCreatedAt } from "../../../models/folder";
+import usePhonecall from "../../../lib/hooks/usePhonecall";
 
 interface MessagePageProps {}
 
@@ -232,6 +233,7 @@ const EditMessageComponent = ({
 };
 
 const MessagePage: React.FC<MessagePageProps> = () => {
+  const { ongoingCall, sendWhatsapp } = usePhonecall();
   const [selectedFolderId, setSelectedFolder] = useState<string>("");
   const [messageToEdit, setMessageToEdit] = useState<Omit<
     Message,
@@ -249,6 +251,17 @@ const MessagePage: React.FC<MessagePageProps> = () => {
   const selectedFolder = useMemo(() => {
     return folders.find(folder => folder?.id === selectedFolderId);
   }, [selectedFolderId]);
+
+  const handleMessageClick = useCallback(
+    async (message: Omit<Message, "createdAt">) => {
+      if (ongoingCall && ongoingCall.number) {
+        await sendWhatsapp(ongoingCall.number, message.body);
+      } else {
+        setMessageToEdit(message);
+      }
+    },
+    [ongoingCall],
+  );
 
   if (loadingData)
     return (
@@ -271,7 +284,7 @@ const MessagePage: React.FC<MessagePageProps> = () => {
             <MessageComponent
               key={message.id}
               message={message}
-              onClick={message => setMessageToEdit(message)}
+              onClick={handleMessageClick}
             />
           ))}
       </div>

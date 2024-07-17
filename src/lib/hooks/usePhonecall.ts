@@ -30,5 +30,20 @@ export default function usePhonecall() {
     }
   }
 
-  return { ongoingCall, loading, getLatestOngoingCall };
+  async function sendWhatsapp(phoneNumber: string, body: string) {
+    try {
+      let formattedNumber = phoneNumber.replace(/\D/g, "");
+      if (formattedNumber.startsWith("0")) {
+        formattedNumber = `+972${formattedNumber.slice(1)}`;
+      }
+      const encodedMessage = encodeURIComponent(body);
+      const url = `https://api.whatsapp.com/send?phone=${formattedNumber}&text=${encodedMessage}`;
+      window.open(url, "_blank");
+    } catch (error) {
+      console.error("Error sending whatsapp", error);
+      throw error;
+    }
+  }
+
+  return { ongoingCall, loading, getLatestOngoingCall, sendWhatsapp };
 }
