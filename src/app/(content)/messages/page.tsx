@@ -57,6 +57,7 @@ const FoldersDropdown = ({
           <DropdownMenuItem
             dir="rtl"
             key={`folder-${folder.id}`}
+            className="text-lg"
             onClick={() => onFolderSelected(folder.id)}
           >
             {folder.title}

@@ -17,16 +17,16 @@ const classNameActive = "w-6 h-6 fill-muted-foreground";
 
 export const BottomBarItems: NavigationBarItem[] = [
   {
-    icon: () => <FaRegEnvelope className={className} />,
-    iconActive: () => <FaEnvelope className={classNameActive} />,
-    label: "הודעות",
-    href: "/messages",
-  },
-  {
     icon: () => <Home className={className} />,
     iconActive: () => <HomeActive className={classNameActive} />,
     label: "סטטיסטקות",
     href: "/home",
+  },
+  {
+    icon: () => <FaRegEnvelope className={className} />,
+    iconActive: () => <FaEnvelope className={classNameActive} />,
+    label: "הודעות",
+    href: "/messages",
   },
   {
     icon: () => <FaRegFolder className={className} />,
