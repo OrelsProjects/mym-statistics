@@ -49,21 +49,20 @@ const FoldersDropdown = ({
         <Button variant="outline">{selectedFolder?.title || "תיקיות"}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel dir="rtl">תיקיות</DropdownMenuLabel>
+        <DropdownMenuLabel dir="rtl" className="text-lg">
+          תיקיות
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {folders
-          // sort by position, so 0 will be first
-          ?.sort((a, b) => a.position - b.position)
-          .map(folder => (
-            <DropdownMenuItem
-              dir="rtl"
-              key={`folder-${folder.id}`}
-              className="text-lg"
-              onClick={() => onFolderSelected(folder.id)}
-            >
-              {folder.title}
-            </DropdownMenuItem>
-          ))}
+        {[...folders].map(folder => (
+          <DropdownMenuItem
+            dir="rtl"
+            key={`folder-${folder.id}`}
+            className="text-lg"
+            onClick={() => onFolderSelected(folder.id)}
+          >
+            {folder.title}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -245,8 +244,8 @@ const MessagePage: React.FC<MessagePageProps> = () => {
   const { data, loadingData, folders } = useAppSelector(selectAuth);
 
   useEffect(() => {
-    if (!selectedFolderId && data.length) {
-      setSelectedFolder(data[0]?.folder?.id || "");
+    if (!selectedFolderId && folders.length) {
+      setSelectedFolder(folders[0].id);
     }
   }, [data]);
 
@@ -279,7 +278,7 @@ const MessagePage: React.FC<MessagePageProps> = () => {
         onFolderSelected={setSelectedFolder}
         selectedFolderId={selectedFolder?.id}
       />
-      <div className="flex flex-wrap gap-4" dir="rtl">
+      <div className="flex flex-wrap justify-center gap-4" dir="rtl">
         {data
           .filter(message => message?.folder?.id === selectedFolderId)
           .map(({ folder, ...message }) => (

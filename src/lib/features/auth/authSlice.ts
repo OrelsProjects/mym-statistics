@@ -76,7 +76,10 @@ const authSlice = createSlice({
       state.loadingData = false;
     },
     setFolders: (state, action: PayloadAction<FolderNoCreatedAt[]>) => {
-      state.folders = action.payload;
+      const sortedFolders = [...action.payload].sort(
+        (a, b) => (a?.position || 99999) - (b?.position || 99999),
+      );
+      state.folders = sortedFolders || [];
     },
     updateFolder: (
       state,
