@@ -43,8 +43,6 @@ const FoldersDropdown = ({
     [selectedFolderId],
   );
 
-  console.log(folders);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -53,16 +51,19 @@ const FoldersDropdown = ({
       <DropdownMenuContent>
         <DropdownMenuLabel dir="rtl">תיקיות</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {folders?.map(folder => (
-          <DropdownMenuItem
-            dir="rtl"
-            key={`folder-${folder.id}`}
-            className="text-lg"
-            onClick={() => onFolderSelected(folder.id)}
-          >
-            {folder.title}
-          </DropdownMenuItem>
-        ))}
+        {folders
+          // sort by position, so 0 will be first
+          ?.sort((a, b) => a.position - b.position)
+          .map(folder => (
+            <DropdownMenuItem
+              dir="rtl"
+              key={`folder-${folder.id}`}
+              className="text-lg"
+              onClick={() => onFolderSelected(folder.id)}
+            >
+              {folder.title}
+            </DropdownMenuItem>
+          ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
