@@ -278,7 +278,10 @@ const MessagePage: React.FC<MessagePageProps> = () => {
         onFolderSelected={setSelectedFolder}
         selectedFolderId={selectedFolder?.id}
       />
-      <div className="flex flex-wrap justify-center gap-4" dir="rtl">
+      <div
+        className="flex flex-wrap justify-center md:justify-start gap-4"
+        dir="rtl"
+      >
         {data
           .filter(message => message?.folder?.id === selectedFolderId)
           .map(({ folder, ...message }) => (
