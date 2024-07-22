@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { IoIosRefresh } from "react-icons/io";
 import { collection, onSnapshot } from "firebase/firestore";
+import { IoIosRefresh } from "react-icons/io";
 import usePhonecall from "../../lib/hooks/usePhonecall";
 import Loading from "../../components/ui/loading";
 import { db } from "../../../firebase.config";
@@ -60,6 +60,10 @@ export function OngoingCallProvider() {
       ) : (
         "אין שיחה פעילה"
       )}
+      <IoIosRefresh
+        className="cursor-pointer w-5 h-5"
+        onClick={getLatestOngoingCall}
+      />
     </div>
   );
 }
