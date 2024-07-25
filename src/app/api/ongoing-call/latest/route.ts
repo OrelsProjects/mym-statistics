@@ -55,7 +55,7 @@ export async function GET(req: NextRequest): Promise<any> {
     }
 
     if (!latestPhoneCall) {
-      return ongoingCall;
+      return NextResponse.json({ ongoingCall }, { status: 200 });
     }
 
     const callStartDate = new Date(latestPhoneCall.startDate).getTime();
