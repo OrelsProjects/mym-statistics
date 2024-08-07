@@ -87,7 +87,7 @@ export default function AuthProvider({
       }
     } else {
       if (!pathname.includes("login") && !pathname.includes("register")) {
-        router.push("/");
+        router.push("/login");
       }
     }
   }, [status]);
