@@ -37,7 +37,7 @@ export default function usePhonecall() {
         formattedNumber = `+972${formattedNumber.slice(1)}`;
       }
       const encodedMessage = encodeURIComponent(body);
-      const url = `https://api.whatsapp.com/send?phone=${formattedNumber}&text=${encodedMessage}`;
+      const url = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
       window.open(url, "_blank");
     } catch (error) {
       console.error("Error sending whatsapp", error);
