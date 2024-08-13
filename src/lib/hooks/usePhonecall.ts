@@ -39,16 +39,16 @@ export default function usePhonecall() {
       const encodedMessage = encodeURIComponent(body);
       const url = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
       // open window and close that new tab after 5 seconds
-      const newWindow = window.open(url, "_blank");
-      if (newWindow) {
-        setTimeout(() => {
-          try {
-            newWindow.close();
-          } catch (error) {
-            console.error("Error closing new window", error);
-          }
-        }, 4000);
-      }
+      window.open(url, "_blank");
+      // if (newWindow) {
+      //   setTimeout(() => {
+      //     try {
+      //       newWindow.close();
+      //     } catch (error) {
+      //       console.error("Error closing new window", error);
+      //     }
+      //   }, 4000);
+      // }
     } catch (error) {
       console.error("Error sending whatsapp", error);
       throw error;
