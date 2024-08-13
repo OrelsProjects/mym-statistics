@@ -9,9 +9,9 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import TopLoaderProvider from "./providers/TopLoaderProvider";
 
-const APP_NAME = "Saas template";
-const APP_DEFAULT_TITLE = "Saas template";
-const APP_TITLE_TEMPLATE = "%s - Saas template";
+const APP_NAME = "MyMessages";
+const APP_DEFAULT_TITLE = "MyMessages";
+const APP_TITLE_TEMPLATE = "%s - MyMessages";
 const APP_DESCRIPTION = "Build your SaaS easily!";
 
 interface RootLayoutProps {

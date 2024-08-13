@@ -37,7 +37,8 @@ export default function usePhonecall() {
         formattedNumber = `+972${formattedNumber.slice(1)}`;
       }
       const encodedMessage = encodeURIComponent(body);
-      const url = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
+      // const url = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
+      const url = `whatsapp://send?phone=${formattedNumber}&text=${encodedMessage}`;
       // open window and close that new tab after 5 seconds
       window.open(url, "_blank");
       // if (newWindow) {
