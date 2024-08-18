@@ -15,7 +15,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = () => {
           <UserAvatar
             photoURL={user?.photoURL || "/images/default-profile.png"}
             displayName={user?.displayName}
-            imageClassName="rounded-full hover:cursor-pointer !w-12 !h-12 shadow-md"
+            imageClassName="rounded-full hover:cursor-pointer !w-12 !h-12 shadow-md  2xl:!h-24 2xl:!w-24"
             className="w-12 h-12 md:hover:shadow-lg md:hover:cursor-pointer rounded-full"
             hideTooltip
           />

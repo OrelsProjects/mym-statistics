@@ -1,9 +1,11 @@
 import { ElementType } from "react";
-import { GoHomeFill as HomeActive, GoHome as Home } from "react-icons/go";
+import { IoStatsChartOutline, IoStatsChart } from "react-icons/io5";
+
 import { FaRegEnvelope } from "react-icons/fa";
 import { FaEnvelope } from "react-icons/fa6";
 import { FaRegFolder } from "react-icons/fa6";
 import { FaFolder } from "react-icons/fa";
+import { cn } from "../../lib/utils";
 
 export interface NavigationBarItem {
   icon: ElementType;
@@ -12,26 +14,39 @@ export interface NavigationBarItem {
   href: string;
 }
 
-const className = "w-6 h-6 fill-muted-foreground/40 text-muted-foreground/40";
-const classNameActive = "w-6 h-6 fill-muted-foreground";
+const classNameInActive =
+  "w-6 h-6 2xl:w-12 2xl:h-12 fill-muted-foreground/40 text-muted-foreground/40";
+const classNameActive = "w-6 h-6 2xl:w-12 2xl:h-12 fill-muted-foreground";
 
 export const BottomBarItems: NavigationBarItem[] = [
   {
-    icon: () => <Home className={className} />,
-    iconActive: () => <HomeActive className={classNameActive} />,
-    label: "סטטיסטקות",
-    href: "/home",
-  },
-  {
-    icon: () => <FaRegEnvelope className={className} />,
-    iconActive: () => <FaEnvelope className={classNameActive} />,
+    icon: ({ className }: { className?: string }) => (
+      <FaRegEnvelope className={cn(classNameInActive, className)} />
+    ),
+    iconActive: ({ className }: { className?: string }) => (
+      <FaEnvelope className={cn(classNameActive, className)} />
+    ),
     label: "הודעות",
     href: "/messages",
   },
   {
-    icon: () => <FaRegFolder className={className} />,
-    iconActive: () => <FaFolder className={classNameActive} />,
+    icon: ({ className }: { className?: string }) => (
+      <FaRegFolder className={cn(classNameInActive, className)} />
+    ),
+    iconActive: ({ className }: { className?: string }) => (
+      <FaFolder className={cn(classNameActive, className)} />
+    ),
     label: "תיקיות",
     href: "/folders",
+  },
+  {
+    icon: ({ className }: { className?: string }) => (
+      <IoStatsChartOutline className={cn(classNameInActive, className)} />
+    ),
+    iconActive: ({ className }: { className?: string }) => (
+      <IoStatsChart className={cn(classNameActive, className)} />
+    ),
+    label: "סטטיסטקות",
+    href: "/home",
   },
 ];
