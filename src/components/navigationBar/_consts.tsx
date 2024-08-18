@@ -15,8 +15,8 @@ export interface NavigationBarItem {
 }
 
 const classNameInActive =
-  "w-6 h-6 2xl:w-12 2xl:h-12 fill-muted-foreground/40 text-muted-foreground/40";
-const classNameActive = "w-6 h-6 2xl:w-12 2xl:h-12 fill-muted-foreground";
+  "w-6 h-6 4k:w-12 4k:h-12 fill-muted-foreground/40 text-muted-foreground/40";
+const classNameActive = "w-6 h-6 4k:w-12 4k:h-12 fill-muted-foreground";
 
 export const BottomBarItems: NavigationBarItem[] = [
   {

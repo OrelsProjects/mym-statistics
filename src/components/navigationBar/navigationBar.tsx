@@ -39,18 +39,18 @@ const NavigationBar: React.FC<NavigationBar> = ({ ...props }) => {
       // data-onboarding-id={`navigation-bar-item-${item.label}`}
       data-onboarding-id={id}
     >
-      <div className="flex flex-col lg:flex-row gap-2 2xl:gap-4 justify-center items-center">
+      <div className="flex flex-col lg:flex-row gap-2 4k:gap-4 justify-center items-center">
         <span className="indicator">
           {isItemActive(item) ? (
-            <item.iconActive className="2xl:h-16 2xl:w-16" />
+            <item.iconActive className="4k:h-16 4k:w-16" />
           ) : (
-            <item.icon className="2xl:h-16 2xl:w-16" />
+            <item.icon className="4k:h-16 4k:w-16" />
           )}
         </span>
         <span className="lg:hidden text-[0.7rem] leading-3 tracking-tight capitalize -mt-0.5 font-medium text-base-content/75">
           {item.label}
         </span>
-        <span className="hidden lg:inline tracking-tight uppercase font-semibold text-muted-foreground  2xl:text-2xl">
+        <span className="hidden lg:inline tracking-tight uppercase font-semibold text-muted-foreground  4k:text-2xl">
           {item.label}
         </span>
       </div>
@@ -60,12 +60,12 @@ const NavigationBar: React.FC<NavigationBar> = ({ ...props }) => {
   const SideNavigationBar = () => (
     <div
       className={cn(
-        "hidden lg:sticky lg:flex lg:w-60 2xl:w-[22rem] inset-x-0 bottom-0 lg:left-0 z-40 bg-base-200 border-base-content/10 select-none",
+        "hidden lg:sticky lg:flex lg:w-60 4k:w-[24rem] inset-x-0 bottom-0 lg:left-0 z-40 bg-base-200 border-base-content/10 select-none",
         props.className,
       )}
       ref={props.ref}
     >
-      <div className="h-16 2xl:h-80 2xl:w-[40rem] w-fit flex flex-col gap-2">
+      <div className="h-16 4k:h-80 4k:w-[40rem] w-fit flex flex-col gap-2">
         {items.map(item => (
           <Item
             item={item}

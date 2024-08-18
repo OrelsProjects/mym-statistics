@@ -37,7 +37,7 @@ export const UserAvatar = ({
   return (
     <Avatar
       className={cn(
-        "relative rounded-none cursor-default h-11 w-11 2xl:h-24 2xl:w-24",
+        "relative rounded-none cursor-default h-11 w-11 4k:h-24 4k:w-24",
         className,
       )}
     >

@@ -46,10 +46,10 @@ const FoldersDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="2xl:text-3xl 2xl:py-8">{selectedFolder?.title || "תיקיות"}</Button>
+        <Button variant="outline" className="4k:text-3xl 4k:py-8">{selectedFolder?.title || "תיקיות"}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel dir="rtl" className="text-lg 2xl:text-3xl">
+        <DropdownMenuLabel dir="rtl" className="text-lg 4k:text-3xl">
           תיקיות
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -57,7 +57,7 @@ const FoldersDropdown = ({
           <DropdownMenuItem
             dir="rtl"
             key={`folder-${folder.id}`}
-            className="text-lg 2xl:text-3xl"
+            className="text-lg 4k:text-3xl"
             onClick={() => onFolderSelected(folder.id)}
           >
             {folder.title}
@@ -76,11 +76,11 @@ const MessageComponent = ({
   onClick?: (message: Omit<Message, "createdAt">) => void;
 }) => (
   <div
-    className="h-24 w-24 2xl:h-64 2xl:w-64 flex flex-col justify-center items-center rounded-lg shadow-lg dark:bg-muted p-2 hover:cursor-pointer"
+    className="h-24 w-24 4k:h-64 4k:w-64 flex flex-col justify-center items-center rounded-lg shadow-lg dark:bg-muted p-2 hover:cursor-pointer"
     onClick={() => onClick?.(message)}
   >
-    <p className="2xl:text-2xl">{message.shortTitle}</p>
-    <h3 className="line-clamp-1 text-center 2xl:text-4xl">{message.title}</h3>
+    <p className="4k:text-2xl">{message.shortTitle}</p>
+    <h3 className="line-clamp-1 text-center 4k:text-4xl">{message.title}</h3>
   </div>
 );
 
@@ -292,7 +292,7 @@ const MessagePage: React.FC<MessagePageProps> = () => {
             />
           ))}
       </div>
-      <Button variant="secondary" className="2xl:py-8 2xl:text-2xl" onClick={() => setMessageToEdit({} as any)}>
+      <Button variant="secondary" className="4k:py-8 4k:text-2xl" onClick={() => setMessageToEdit({} as any)}>
         הוסף הודעה
       </Button>
       <EditMessageComponent

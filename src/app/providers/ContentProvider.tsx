@@ -53,7 +53,7 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
     <div className="w-screen h-screen md:h-[100vh] flex flex-col relative">
       <div
         className={cn(
-          "w-full lg:max-w-[65rem] 2xl:max-w-[160rem] mx-auto lg:flex p-4 relative md:!h-screen md:!max-h-screen",
+          "w-full lg:max-w-[65rem] 4k:max-w-[160rem] mx-auto lg:flex p-4 relative md:!h-screen md:!max-h-screen",
           {
             "pb-[calc(max(env(safe-area-inset-bottom), 16px) - 16px)]": user,
           },

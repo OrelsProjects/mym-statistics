@@ -25,7 +25,7 @@ export default function ContentLayout({ children }: RootLayoutProps) {
           <ContentProvider>
             <TopLoaderProvider />
             <OngoingCallProvider />
-            <AnimationProvider className="2xl:mt-4">{children}</AnimationProvider>
+            <AnimationProvider className="4k:mt-4">{children}</AnimationProvider>
           </ContentProvider>
         </HeightProvider>
       </AuthProvider>
