@@ -10,8 +10,8 @@ export type MessageWithNestedFolders = Message & {
 export type MessageNoCreatedAt = Omit<Message, "createdAt">;
 
 export type CreateMessage = Omit<
-  Message,
-  "id" | "createdAt" | "userId" | "timesUsed" | "isActive"
+Message,
+"id" | "createdAt" | "userId" | "timesUsed" | "isActive"
 >;
 
 export type MessageWithFolder = MessageNoCreatedAt & {

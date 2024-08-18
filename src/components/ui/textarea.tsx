@@ -11,7 +11,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, ...props }, ref) => {
     return (
       <div className="flex flex-col gap-0 w-full">
-        {label && <label className="text-sm text-foreground">{label}</label>}
+        {label && (
+          <label className="text-sm 4k:text-4xl 4k:gap-2 text-foreground">
+            {label}
+          </label>
+        )}
         <textarea
           className={cn(
             "flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",

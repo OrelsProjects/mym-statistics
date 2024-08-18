@@ -14,6 +14,7 @@ import Loading from "../../../components/ui/loading";
 import { Button } from "../../../components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogTitle,
 } from "../../../components/ui/dialog";
@@ -46,23 +47,27 @@ const FoldersDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="4k:text-3xl 4k:py-8">{selectedFolder?.title || "תיקיות"}</Button>
+        <Button variant="outline" className="4k:text-6xl 4k:py-16">
+          {selectedFolder?.title || "תיקיות"}
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel dir="rtl" className="text-lg 4k:text-3xl">
+      <DropdownMenuContent className="4k:pl-16 4k:py-4">
+        <DropdownMenuLabel dir="rtl" className="text-lg 4k:text-5xl">
           תיקיות
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {[...folders].map(folder => (
-          <DropdownMenuItem
-            dir="rtl"
-            key={`folder-${folder.id}`}
-            className="text-lg 4k:text-3xl"
-            onClick={() => onFolderSelected(folder.id)}
-          >
-            {folder.title}
-          </DropdownMenuItem>
-        ))}
+        <div className="flex flex-col 4k:gap-6">
+          {[...folders].map(folder => (
+            <DropdownMenuItem
+              dir="rtl"
+              key={`folder-${folder.id}`}
+              className="text-lg 4k:text-4xl"
+              onClick={() => onFolderSelected(folder.id)}
+            >
+              {folder.title}
+            </DropdownMenuItem>
+          ))}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -176,15 +181,18 @@ const EditMessageComponent = ({
         if (!value) onClose();
       }}
     >
-      <DialogContent closeOnOutsideClick={false}>
-        <DialogTitle dir="rtl" className="mt-8">
-          עריכת הודעה
-        </DialogTitle>
+      <DialogContent
+        closeOnOutsideClick={false}
+        className="4k:w-[80%] 4k:aspect-video 4k:max-w-full "
+      >
         <form
           onSubmit={formik.handleSubmit}
-          className="flex flex-col gap-4"
+          className="h-full flex flex-col gap-4 justify-start"
           dir="rtl"
         >
+          <DialogTitle dir="rtl" className="mt-8 4k:text-6xl">
+            עריכת הודעה
+          </DialogTitle>
           <FoldersDropdown
             onFolderSelected={folderId =>
               formik.setFieldValue("folderId", folderId)
@@ -198,6 +206,7 @@ const EditMessageComponent = ({
             value={formik.values.title}
             onChange={formik.handleChange}
             required
+            className="4k:text-2xl"
           />
           <Input
             label="כותרת קצרה"
@@ -292,7 +301,11 @@ const MessagePage: React.FC<MessagePageProps> = () => {
             />
           ))}
       </div>
-      <Button variant="secondary" className="4k:py-8 4k:text-2xl" onClick={() => setMessageToEdit({} as any)}>
+      <Button
+        variant="secondary"
+        className="4k:py-8 4k:text-2xl"
+        onClick={() => setMessageToEdit({} as any)}
+      >
         הוסף הודעה
       </Button>
       <EditMessageComponent

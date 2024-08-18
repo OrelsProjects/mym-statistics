@@ -20,6 +20,7 @@ export default function usePhonecall() {
         diff: number;
         ongoingCall?: Partial<OngoingCall>;
       }>("/api/ongoing-call/latest");
+      // debugger;
       dispatch(setOngoingCall(result.data.ongoingCall));
     } catch (error) {
       console.error("Error getting latest ongoing call", error);
