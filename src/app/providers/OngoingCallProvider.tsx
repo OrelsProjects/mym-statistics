@@ -8,7 +8,11 @@ import Loading from "../../components/ui/loading";
 import { db } from "../../../firebase.config";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks/redux";
 import { selectAuth } from "../../lib/features/auth/authSlice";
-import { setOngoingCall } from "../../lib/features/ongoingCall/ongoingCallSlice";
+import {
+  setIsInit,
+  setOngoingCall,
+} from "../../lib/features/ongoingCall/ongoingCallSlice";
+import { Logger } from "../../logger";
 
 export function OngoingCallProvider() {
   const dispatch = useAppDispatch();
@@ -29,14 +33,26 @@ export function OngoingCallProvider() {
   React.useEffect(() => {
     let unsubscribe: () => void = () => {};
     if (db && user) {
+      Logger.debug("Subscribing to ongoing call snapshot", {
+        data: { user: JSON.stringify(user) },
+      });
       unsubscribe = onSnapshot(
         collection(db, "users", user.id, "ongoingCalls"),
         async doc => {
           if (!isInit) {
             await getLatestOngoingCall();
+            setIsInit(true);
             return;
           }
+          Logger.debug("Ongoing call snapshot", {
+            data: { changes: JSON.stringify(doc.docChanges() || "{}") },
+          });
           const latestOngoingCall = doc.docChanges()?.[0]?.doc?.data();
+          Logger.debug("Latest ongoing call", {
+            data: {
+              latestOngoingCall: JSON.stringify(latestOngoingCall || "{}"),
+            },
+          });
           if (latestOngoingCall.endDate) {
             dispatch(setOngoingCall(undefined));
           } else {
@@ -44,8 +60,11 @@ export function OngoingCallProvider() {
           }
         },
       );
+    } else {
+      Logger.warn("DB or user not found", {
+        data: { db: JSON.stringify(db), user: JSON.stringify(user) },
+      });
     }
-
     return () => {
       unsubscribe();
     };
