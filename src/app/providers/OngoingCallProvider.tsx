@@ -1,15 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { IoIosRefresh } from "react-icons/io";
-import usePhonecall from "../../lib/hooks/usePhonecall";
 import Loading from "../../components/ui/loading";
 import { db } from "../../../firebase.config";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks/redux";
 import { selectAuth } from "../../lib/features/auth/authSlice";
 import {
-  setIsInit,
   setOngoingCall,
 } from "../../lib/features/ongoingCall/ongoingCallSlice";
 import { Logger } from "../../logger";
@@ -20,16 +18,7 @@ export function OngoingCallProvider() {
   const { loading, ongoingCall, isInit } = useAppSelector(
     state => state.ongoingCall,
   );
-  const { getLatestOngoingCall } = usePhonecall();
-
-  React.useEffect(() => {
-    try {
-      getLatestOngoingCall();
-    } catch (error) {
-      console.error("Error getting latest ongoing call", error);
-    }
-  }, []);
-
+ 
   React.useEffect(() => {
     let unsubscribe: () => void = () => {};
     if (db && user) {
@@ -37,23 +26,18 @@ export function OngoingCallProvider() {
         data: { user: JSON.stringify(user) },
       });
       unsubscribe = onSnapshot(
-        collection(db, "users", user.id, "ongoingCalls"),
+        doc(db, "users", user.id, "ongoingCalls", "latest"),
         async doc => {
-          if (!isInit) {
-            await getLatestOngoingCall();
-            setIsInit(true);
-            return;
-          }
           Logger.debug("Ongoing call snapshot", {
-            data: { changes: JSON.stringify(doc.docChanges() || "{}") },
+            data: { changes: JSON.stringify(doc.data() || "{}") },
           });
-          const latestOngoingCall = doc.docChanges()?.[0]?.doc?.data();
+          const latestOngoingCall = doc.data();
           Logger.debug("Latest ongoing call", {
             data: {
               latestOngoingCall: JSON.stringify(latestOngoingCall || "{}"),
             },
           });
-          if (latestOngoingCall.endDate) {
+          if (!latestOngoingCall) {
             dispatch(setOngoingCall(undefined));
           } else {
             dispatch(setOngoingCall(latestOngoingCall));
@@ -81,7 +65,6 @@ export function OngoingCallProvider() {
       )}
       <IoIosRefresh
         className="cursor-pointer w-5 h-5 4k:w-10 4k:h-10"
-        onClick={getLatestOngoingCall}
       />
     </div>
   );
