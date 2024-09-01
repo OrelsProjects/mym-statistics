@@ -27,6 +27,7 @@ import { Textarea } from "../../../components/ui/textarea";
 import { toast } from "react-toastify";
 import { FolderNoCreatedAt } from "../../../models/folder";
 import usePhonecall from "../../../lib/hooks/usePhonecall";
+import LongPressDiv from "../../../components/ui/longPressDiv";
 
 interface MessagePageProps {}
 
@@ -79,14 +80,20 @@ const MessageComponent = ({
 }: {
   message: Omit<Message, "createdAt">;
   onClick?: (message: Omit<Message, "createdAt">) => void;
+  onLongClick?: (message: Omit<Message, "createdAt">) => void;
 }) => (
-  <div
+  <LongPressDiv
     className="h-24 w-24 4k:h-64 4k:w-64 flex flex-col justify-center items-center rounded-lg shadow-lg dark:bg-muted p-2 hover:cursor-pointer"
-    onClick={() => onClick?.(message)}
+    onLongPress={() => {
+      if (window && navigator.clipboard) {
+        navigator.clipboard.writeText(message.body);
+        toast.info("הודעה הועתקה ללוח");
+      }
+    }}
   >
     <p className="4k:text-2xl">{message.shortTitle}</p>
     <h3 className="line-clamp-1 text-center 4k:text-4xl">{message.title}</h3>
-  </div>
+  </LongPressDiv>
 );
 
 const EditMessageComponent = ({
