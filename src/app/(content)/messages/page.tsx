@@ -84,6 +84,7 @@ const MessageComponent = ({
 }) => (
   <LongPressDiv
     className="h-24 w-24 4k:h-64 4k:w-64 flex flex-col justify-center items-center rounded-lg shadow-lg dark:bg-muted p-2 hover:cursor-pointer"
+    onClick={() => onClick && onClick(message)}
     onLongPress={() => {
       if (window && navigator.clipboard) {
         navigator.clipboard.writeText(message.body);
