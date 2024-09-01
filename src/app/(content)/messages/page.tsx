@@ -87,7 +87,9 @@ const MessageComponent = ({
     onLongPress={() => {
       if (window && navigator.clipboard) {
         navigator.clipboard.writeText(message.body);
-        toast.info("הודעה הועתקה ללוח");
+        toast("העתקתי את ההודעה. תהנה :)", {
+          rtl: true,
+        });
       }
     }}
   >
