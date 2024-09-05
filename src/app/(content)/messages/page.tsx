@@ -24,6 +24,7 @@ import { FolderNoCreatedAt } from "@/models/folder";
 import usePhonecall from "@/lib/hooks/usePhonecall";
 import LongPressDiv from "@/components/ui/longPressDiv";
 import { Logger } from "@/logger";
+import Link from "next/link";
 
 interface MessagePageProps {}
 
@@ -368,6 +369,9 @@ const MessagePage: React.FC<MessagePageProps> = () => {
         }}
         onClose={() => setMessageToEdit(null)}
       />
+      <Button asChild>
+        <Link href="tel:+972543056286">Call</Link>
+      </Button>
     </div>
   );
 };
