@@ -1,5 +1,4 @@
 import { OngoingCall } from "@prisma/client";
-import axios from "axios";
 import { useAppDispatch, useAppSelector } from "./redux";
 import {
   selectOngoingCall,
@@ -7,22 +6,46 @@ import {
   setLoading,
   setOngoingCall,
 } from "../features/ongoingCall/ongoingCallSlice";
+import { db } from "@/../firebase.config";
+import { doc, getDoc } from "firebase/firestore";
+import { selectAuth } from "@/lib/features/auth/authSlice";
+import { useEffect, useRef } from "react";
 
 export default function usePhonecall() {
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector(selectAuth);
   const { ongoingCall, loading } = useAppSelector(selectOngoingCall);
+  const userRef = useRef(user); // For when the user changes tabs, when the user returns, the user is null in redux.
+
+  useEffect(() => {
+    if (user) {
+      userRef.current = user;
+    }
+  }, [user]);
 
   async function getLatestOngoingCall() {
+    console.log("REFRESHING");
     if (loading) return;
     try {
+      if (!db || !userRef.current) {
+        throw new Error("DB or user not found");
+      }
       dispatch(setLoading(true));
-      const result = await axios.get<{
-        diff: number;
-        ongoingCall?: Partial<OngoingCall>;
-      }>("/api/ongoing-call/latest");
-      // debugger;
-      dispatch(setOngoingCall(result.data.ongoingCall));
-      return result.data.ongoingCall;
+      const phoneCallDocRef = doc(
+        db,
+        "users",
+        userRef.current.id,
+        "ongoingCalls",
+        "latest",
+      );
+      const result = await getDoc(phoneCallDocRef);
+      if (!result.exists()) {
+        dispatch(setOngoingCall(undefined));
+        return;
+      }
+      const ongoingCall = result.data() as OngoingCall;
+      dispatch(setOngoingCall(ongoingCall));
+      return ongoingCall;
     } catch (error) {
       console.error("Error getting latest ongoing call", error);
       throw error;

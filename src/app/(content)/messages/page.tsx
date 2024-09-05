@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Folder, Message } from "@prisma/client";
+import { Message } from "@prisma/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,25 +9,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
-import Loading from "../../../components/ui/loading";
-import { Button } from "../../../components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-} from "../../../components/ui/dialog";
-import { selectAuth } from "../../../lib/features/auth/authSlice";
-import { useAppSelector } from "../../../lib/hooks/redux";
-import useMessage from "../../../lib/hooks/useMessage";
+} from "@/components/ui/dropdown-menu";
+import Loading from "@/components/ui/loading";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { selectAuth } from "@/lib/features/auth/authSlice";
+import { useAppSelector } from "@/lib/hooks/redux";
+import useMessage from "@/lib/hooks/useMessage";
 import { useFormik } from "formik";
-import { Input } from "../../../components/ui/input";
-import { Textarea } from "../../../components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
-import { FolderNoCreatedAt } from "../../../models/folder";
-import usePhonecall from "../../../lib/hooks/usePhonecall";
-import LongPressDiv from "../../../components/ui/longPressDiv";
+import { FolderNoCreatedAt } from "@/models/folder";
+import usePhonecall from "@/lib/hooks/usePhonecall";
+import LongPressDiv from "@/components/ui/longPressDiv";
+import { Logger } from "@/logger";
 
 interface MessagePageProps {}
 
@@ -261,6 +257,18 @@ const MessagePage: React.FC<MessagePageProps> = () => {
   > | null>(null);
   const { updateMessage, createMessage, deleteMessage } = useMessage();
   const { data, loadingData, folders } = useAppSelector(selectAuth);
+  // addEventListener("visibilitychange", (event) => {getLatestOngoingCall();});
+
+  useEffect(() => {
+    addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        getLatestOngoingCall();
+      }
+    });
+    return () => {
+      removeEventListener("visibilitychange", getLatestOngoingCall);
+    };
+  }, []);
 
   useEffect(() => {
     if (!selectedFolderId && folders.length) {
@@ -274,12 +282,21 @@ const MessagePage: React.FC<MessagePageProps> = () => {
 
   const handleMessageClick = useCallback(
     async (message: Omit<Message, "createdAt">) => {
-      const latestCall = await getLatestOngoingCall();
-      const number = ongoingCall?.number || latestCall?.number;
-      if (number) {
-        await sendWhatsapp(number, message.body);
-      } else {
-        setMessageToEdit(message);
+      try {
+        const latestCall = await getLatestOngoingCall();
+        const number = ongoingCall?.number || latestCall?.number;
+        if (number) {
+          await sendWhatsapp(number, message.body);
+        } else {
+          setMessageToEdit(message);
+        }
+      } catch (error: any) {
+        Logger.error("Error sending message", error);
+        if (ongoingCall?.number) {
+          await sendWhatsapp(ongoingCall.number, message.body);
+        } else {
+          setMessageToEdit(message);
+        }
       }
     },
     [ongoingCall],
