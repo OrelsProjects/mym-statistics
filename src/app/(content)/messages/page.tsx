@@ -253,7 +253,7 @@ const EditMessageComponent = ({
 };
 
 const MessagePage: React.FC<MessagePageProps> = () => {
-  const { ongoingCall, sendWhatsapp } = usePhonecall();
+  const { ongoingCall, sendWhatsapp, getLatestOngoingCall } = usePhonecall();
   const [selectedFolderId, setSelectedFolder] = useState<string>("");
   const [messageToEdit, setMessageToEdit] = useState<Omit<
     Message,
@@ -274,8 +274,10 @@ const MessagePage: React.FC<MessagePageProps> = () => {
 
   const handleMessageClick = useCallback(
     async (message: Omit<Message, "createdAt">) => {
-      if (ongoingCall && ongoingCall.number) {
-        await sendWhatsapp(ongoingCall.number, message.body);
+      const latestCall = await getLatestOngoingCall();
+      const number = ongoingCall?.number || latestCall?.number;
+      if (number) {
+        await sendWhatsapp(number, message.body);
       } else {
         setMessageToEdit(message);
       }

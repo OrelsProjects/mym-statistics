@@ -3,14 +3,13 @@
 import * as React from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { IoIosRefresh } from "react-icons/io";
-import Loading from "../../components/ui/loading";
-import { db } from "../../../firebase.config";
-import { useAppDispatch, useAppSelector } from "../../lib/hooks/redux";
-import { selectAuth } from "../../lib/features/auth/authSlice";
-import {
-  setOngoingCall,
-} from "../../lib/features/ongoingCall/ongoingCallSlice";
-import { Logger } from "../../logger";
+import Loading from "@/components/ui/loading";
+import { db } from "@/../firebase.config";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
+import { selectAuth } from "@/lib/features/auth/authSlice";
+import { setOngoingCall } from "@/lib/features/ongoingCall/ongoingCallSlice";
+import { Logger } from "@/logger";
+import usePhonecall from "@/lib/hooks/usePhonecall";
 
 export function OngoingCallProvider() {
   const dispatch = useAppDispatch();
@@ -18,7 +17,9 @@ export function OngoingCallProvider() {
   const { loading, ongoingCall, isInit } = useAppSelector(
     state => state.ongoingCall,
   );
- 
+
+  const { getLatestOngoingCall } = usePhonecall();
+
   React.useEffect(() => {
     let unsubscribe: () => void = () => {};
     if (db && user) {
@@ -65,6 +66,7 @@ export function OngoingCallProvider() {
       )}
       <IoIosRefresh
         className="cursor-pointer w-5 h-5 4k:w-10 4k:h-10"
+        onClick={getLatestOngoingCall}
       />
     </div>
   );

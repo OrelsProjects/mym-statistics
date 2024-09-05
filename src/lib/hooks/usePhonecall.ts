@@ -22,6 +22,7 @@ export default function usePhonecall() {
       }>("/api/ongoing-call/latest");
       // debugger;
       dispatch(setOngoingCall(result.data.ongoingCall));
+      return result.data.ongoingCall;
     } catch (error) {
       console.error("Error getting latest ongoing call", error);
       throw error;
