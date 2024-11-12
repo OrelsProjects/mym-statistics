@@ -102,7 +102,7 @@ export default function StatisticsDashboard() {
             <TabsTrigger value="daily">יומי</TabsTrigger>
           </TabsList>
           <TabsContent value="custom" className="mt-4">
-            <div className="flex space-x-4 absolute">
+            <div className="flex space-x-4 absolute z-50">
               <Calendar
                 mode="range"
                 selected={dateRange}
@@ -119,7 +119,7 @@ export default function StatisticsDashboard() {
             </div>
           </TabsContent>
         </Tabs>
-        <div className="w-full h-full mt-6 relative">
+        <div className="w-full h-full mt-6 relative z-10">
           <div
             className={cn(
               "absolute inset-0 bg-black/60 z-50 flex justify-center items-center",
