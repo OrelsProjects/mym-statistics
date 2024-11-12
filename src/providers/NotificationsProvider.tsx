@@ -3,9 +3,9 @@
 import React, { useEffect } from "react";
 // import { messaging } from "../../../firebase.config";
 import { Messaging, onMessage } from "firebase/messaging";
-import { useAppSelector } from "../../lib/hooks/redux";
-import { NotificationType } from "../../models/notification";
-import useNotification from "../../lib/hooks/useNotification";
+import { useAppSelector } from "../lib/hooks/redux";
+import { NotificationType } from "../models/notification";
+import useNotification from "../lib/hooks/useNotification";
 
 const NotificationsProvider = () => {
   const { user } = useAppSelector(state => state.auth);

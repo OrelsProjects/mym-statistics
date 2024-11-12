@@ -10,6 +10,7 @@ import { db } from "@/../firebase.config";
 import { doc, getDoc } from "firebase/firestore";
 import { selectAuth } from "@/lib/features/auth/authSlice";
 import { useEffect, useRef } from "react";
+import { Logger } from "../../logger";
 
 export default function usePhonecall() {
   const dispatch = useAppDispatch();
@@ -28,7 +29,8 @@ export default function usePhonecall() {
     if (loading) return;
     try {
       if (!db || !userRef.current) {
-        throw new Error("DB or user not found");
+        Logger.error("DB or user is not defined");
+        return;
       }
       dispatch(setLoading(true));
       const phoneCallDocRef = doc(

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import SizeContext from "../../lib/context/sizeContext";
+import SizeContext from "../lib/context/sizeContext";
 
 // this one calculates the height of the screen and sets it as max height
 // for the children

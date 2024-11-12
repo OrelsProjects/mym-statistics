@@ -1,16 +1,16 @@
 "use client";
 
 import React from "react";
-import "../../../firebase.config";
+import "@/../firebase.config";
 import type { Viewport } from "next";
 
-import AuthProvider from "../providers/AuthProvider";
-import NotificationsProvider from "../providers/NotificationsProvider";
-import TopLoaderProvider from "../providers/TopLoaderProvider";
-import AnimationProvider from "../providers/AnimationProvider";
-import HeightProvider from "../providers/HeightProvider";
-import ContentProvider from "../providers/ContentProvider";
-import { OngoingCallProvider } from "../providers/OngoingCallProvider";
+import AuthProvider from "@/providers/AuthProvider";
+import NotificationsProvider from "@/providers/NotificationsProvider";
+import TopLoaderProvider from "@/providers/TopLoaderProvider";
+import AnimationProvider from "@/providers/AnimationProvider";
+import HeightProvider from "@/providers/HeightProvider";
+import ContentProvider from "@/providers/ContentProvider";
+import { OngoingCallProvider } from "@/providers/OngoingCallProvider";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -25,7 +25,9 @@ export default function ContentLayout({ children }: RootLayoutProps) {
           <ContentProvider>
             <TopLoaderProvider />
             <OngoingCallProvider />
-            <AnimationProvider className="4k:mt-4">{children}</AnimationProvider>
+            <AnimationProvider className="4k:mt-4">
+              {children}
+            </AnimationProvider>
           </ContentProvider>
         </HeightProvider>
       </AuthProvider>

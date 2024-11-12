@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import StoreProvider from "./providers/StoreProvider";
-import { ThemeProvider } from "./providers/ThemeProvider";
-import SessionWrapper from "./providers/SessionWrapper";
+import StoreProvider from "../providers/StoreProvider";
+import { ThemeProvider } from "../providers/ThemeProvider";
+import SessionWrapper from "../providers/SessionWrapper";
 import React from "react";
-import AuthProvider from "./providers/AuthProvider";
+import AuthProvider from "../providers/AuthProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
-import TopLoaderProvider from "./providers/TopLoaderProvider";
+import TopLoaderProvider from "../providers/TopLoaderProvider";
 
 const APP_NAME = "MyMessages";
 const APP_DEFAULT_TITLE = "MyMessages";

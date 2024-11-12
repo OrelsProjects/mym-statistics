@@ -1,14 +1,7 @@
 import { PhoneCall } from "@prisma/client";
-import {
-  Daily,
-  Day,
-  Weekly,
-  Week,
-  Monthly,
-  Month,
-} from "../../../../../models/statistics";
+import { Daily, Day, Weekly, Week, Monthly, Month } from "@/models/statistics";
 import moment from "moment";
-import { dayNumberToName } from "../../../../../lib/utils/dateUtils";
+import { dayNumberToName } from "@/lib/utils/dateUtils";
 
 export function dividePhoneCallsToDays(phoneCalls: PhoneCall[]): Daily {
   const days: { [key: number]: PhoneCall[] } = {};

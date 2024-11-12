@@ -6,13 +6,13 @@ import { useSelector } from "react-redux";
 import {
   selectAuth,
   setUser as setUserAction,
-} from "../../lib/features/auth/authSlice";
+} from "../lib/features/auth/authSlice";
 import { usePathname, useRouter } from "next/navigation";
 import Loading from "@/components/ui/loading";
-import { setUserEventTracker } from "../../eventTracker";
-import { setUserLogger } from "../../logger";
+import { setUserEventTracker } from "../eventTracker";
+import { setUserLogger } from "../logger";
 import { useSession } from "next-auth/react";
-import { useAppDispatch } from "../../lib/hooks/redux";
+import { useAppDispatch } from "../lib/hooks/redux";
 import { DefaultSession, SessionUser } from "next-auth";
 import { AppUser } from "@prisma/client";
 
@@ -99,5 +99,6 @@ export default function AuthProvider({
       </div>
     );
   }
+
   return children;
 }

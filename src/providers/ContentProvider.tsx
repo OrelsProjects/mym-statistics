@@ -2,15 +2,15 @@
 
 import * as React from "react";
 import "react-toastify/dist/ReactToastify.css";
-import SizeContext from "../../lib/context/sizeContext";
-import NavigationBar from "../../components/navigationBar";
+import SizeContext from "../lib/context/sizeContext";
+import NavigationBar from "../components/navigationBar";
 import { ThemeProvider } from "./ThemeProvider";
 import * as toast from "react-toastify";
-import SettingsComponent from "../../components/settingsContainer";
-import { useAppSelector } from "../../lib/hooks/redux";
-import { cn } from "../../lib/utils";
+import SettingsComponent from "../components/settingsContainer";
+import { useAppSelector } from "../lib/hooks/redux";
+import { cn } from "../lib/utils";
 import { useTheme } from "next-themes";
-import useMessage from "../../lib/hooks/useMessage";
+import useMessage from "../lib/hooks/useMessage";
 
 interface ContentProviderProps {
   children: React.ReactNode;
@@ -53,7 +53,7 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
     <div className="w-screen h-screen md:h-[100vh] flex flex-col relative">
       <div
         className={cn(
-          "w-full lg:max-w-[65rem] 4k:max-w-[160rem] mx-auto lg:flex p-4 relative md:!h-screen md:!max-h-screen",
+          "w-full lg:max-w-[90rem] 4k:max-w-[160rem] mx-auto lg:flex p-4 relative md:!h-screen md:!max-h-screen",
           {
             "pb-[calc(max(env(safe-area-inset-bottom), 16px) - 16px)]": user,
           },
@@ -87,7 +87,7 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
           >
             Migrate
           </Button> */}
-          <div className="w-full h-full flex flex-col relative z-10 overflow-auto scrollbar-hide md:scrollbar-visible md:px-4">
+          <div className="w-full h-full flex flex-col relative z-10 scrollbar-hide md:scrollbar-visible md:px-4">
             {user && <SettingsComponent />}
             {children}
           </div>

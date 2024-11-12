@@ -1,31 +1,16 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Folder, Message } from "@prisma/client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../../../components/ui/dropdown-menu";
-import Loading from "../../../components/ui/loading";
-import { Button } from "../../../components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "../../../components/ui/dialog";
-import { selectAuth } from "../../../lib/features/auth/authSlice";
-import { useAppSelector } from "../../../lib/hooks/redux";
-import useMessage from "../../../lib/hooks/useMessage";
+import React, { useEffect, useMemo, useState } from "react";
+import Loading from "@/components/ui/loading";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { selectAuth } from "@/lib/features/auth/authSlice";
+import { useAppSelector } from "@/lib/hooks/redux";
 import { useFormik } from "formik";
-import { Input } from "../../../components/ui/input";
-import { Textarea } from "../../../components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
-import { FolderNoCreatedAt } from "../../../models/folder";
-import useFolder from "../../../lib/hooks/useFolder";
+import { FolderNoCreatedAt } from "@/models/folder";
+import useFolder from "@/lib/hooks/useFolder";
 
 interface FolderPageProps {}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { isMobilePhone } from "../../lib/utils/notificationUtils";
+import { isMobilePhone } from "../lib/utils/notificationUtils";
 import NextTopLoader from "nextjs-toploader";
 
 export default function TopLoaderProvider() {

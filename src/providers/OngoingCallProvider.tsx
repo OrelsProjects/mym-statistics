@@ -22,7 +22,7 @@ export function OngoingCallProvider() {
 
   React.useEffect(() => {
     let unsubscribe: () => void = () => {};
-    if (db && user) {
+    if (db && user && user.id) {
       Logger.debug("Subscribing to ongoing call snapshot", {
         data: { user: JSON.stringify(user) },
       });

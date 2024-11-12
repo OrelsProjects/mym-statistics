@@ -10,8 +10,8 @@ import {
   dividePhoneCallsToDays,
   dividePhoneCallsToWeeks,
   dividePhoneCallsToMonths,
-} from "./_utils";
-import loggerServer from "../../../../../loggerServer";
+} from "../../_utils";
+import loggerServer from "@/loggerServer";
 
 export async function GET(
   req: NextRequest,
