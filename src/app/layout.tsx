@@ -8,6 +8,8 @@ import AuthProvider from "../providers/AuthProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import TopLoaderProvider from "../providers/TopLoaderProvider";
+import { cn } from "../lib/utils";
+import { Poppins } from "../lib/utils/fontUtils";
 
 const APP_NAME = "MyMessages";
 const APP_DEFAULT_TITLE = "MyMessages";
@@ -66,7 +68,7 @@ export default function Layout({ children }: RootLayoutProps) {
         <meta property="og:image:width" content="<generated>" />
         <meta property="og:image:height" content="<generated>" />
       </head>
-      <body className="!overscroll-none">
+      <body className={cn("!overscroll-none", Poppins.className)}>
         <StoreProvider>
           <SessionWrapper>
             <ThemeProvider>

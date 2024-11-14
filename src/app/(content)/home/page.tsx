@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   format,
   startOfWeek,
@@ -32,6 +32,7 @@ export default function StatisticsDashboard() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false); // State to control Calendar visibility
 
   const fetchData = async (from: Date, to: Date) => {
     try {
@@ -72,57 +73,86 @@ export default function StatisticsDashboard() {
         return;
     }
     setDateRange({ from, to });
-
     fetchData(from, to);
   }, [dateRangeType]);
 
   useEffect(() => {
-    if (dateRangeType !== "custom") {
-      return;
-    }
+    if (dateRangeType !== "custom") return;
     if (dateRange.from && dateRange.to) {
       fetchData(dateRange.from, dateRange.to);
     }
   }, [dateRange, dateRangeType]);
 
+  const tabsTriggerClassname = "text-lg 4k:font-medium 4k:text-5xl 4k:px-8 4k:py-2";
+
   return (
-    <Card className="w-full max-w-4xl 4k:max-w-screen-2xl mx-auto">
+    <Card className="w-full max-w-4xl 4k:max-w-screen-2xl mx-auto 4k:space-y-6">
       <CardHeader>
-        <CardTitle>סטטיסטיקות הודעות שנשלחו</CardTitle>
+        <CardTitle className="text-lg 4k:text-5xl">
+          סטטיסטיקות הודעות שנשלחו
+        </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-start">
+      <CardContent className="flex flex-col items-start 4k:space-y-16">
         <Tabs
           value={dateRangeType}
-          onValueChange={value => setDateRangeType(value as DateRange)}
+          onValueChange={value => {
+            setDateRangeType(value as DateRange);
+          }}
         >
-          <TabsList>
-            <TabsTrigger value="custom">בחירה</TabsTrigger>
-            <TabsTrigger value="monthly">חודשי</TabsTrigger>
-            <TabsTrigger value="weekly">שבועי</TabsTrigger>
-            <TabsTrigger value="daily">יומי</TabsTrigger>
+          <TabsList className="4k:h-fit 4k:p-3">
+            <TabsTrigger
+              className={tabsTriggerClassname}
+              value="custom"
+              onClick={() => {
+                // Toggle calendar open/close if "custom" is already selected
+                if (dateRangeType === "custom") {
+                  setCalendarOpen(!calendarOpen);
+                } else {
+                  setCalendarOpen(true);
+                }
+                setDateRangeType("custom");
+              }}
+            >
+              בחירה
+            </TabsTrigger>
+            <TabsTrigger value="monthly" className={tabsTriggerClassname}>
+              חודשי
+            </TabsTrigger>
+            <TabsTrigger value="weekly" className={tabsTriggerClassname}>
+              שבועי
+            </TabsTrigger>
+            <TabsTrigger value="daily" className={tabsTriggerClassname}>
+              יומי
+            </TabsTrigger>
           </TabsList>
-          <TabsContent value="custom" className="mt-4">
-            <div className="flex space-x-4 absolute z-50">
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={range => {
-                  if (range?.from && range?.to) {
-                    setDateRange({
-                      from: range.from,
-                      to: range.to,
-                    });
-                  }
-                }}
-                className="rounded-md border bg-background"
-              />
-            </div>
+          <TabsContent value="custom">
+            {calendarOpen && ( // Conditionally render calendar based on calendarOpen state
+              <div className="flex space-x-4 absolute z-50">
+                <Calendar
+                  mode="range"
+                  captionLayout="dropdown-buttons"
+                  fromYear={2020}
+                  toYear={2030}
+                  onClose={() => setCalendarOpen(false)} // Close action handled here
+                  selected={dateRange}
+                  onSelect={range => {
+                    if (range?.from && range?.to) {
+                      setDateRange({
+                        from: range.from,
+                        to: range.to,
+                      });
+                    }
+                  }}
+                  className="rounded-md border bg-background"
+                />
+              </div>
+            )}
           </TabsContent>
         </Tabs>
-        <div className="w-full h-full mt-6 relative z-10">
+        <div className="w-full h-full relative z-10">
           <div
             className={cn(
-              "absolute inset-0 bg-black/60 z-50 flex justify-center items-center",
+              "absolute inset-0 bg-background/60 z-50 flex justify-center items-center",
               {
                 hidden: !loading,
               },

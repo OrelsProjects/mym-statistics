@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { TrendingUp } from "lucide-react";
 
 import {
   Card,
@@ -13,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -38,17 +36,28 @@ export function DynamicChart({ data, from, to }: DynamicChartProps) {
       .slice(0, 10);
   }, [data]);
 
+  // dx -> Set it to 10 if small screen, 20 if desktop, 40 if 4k
+  const dx = useMemo(
+    () =>
+      window.innerWidth < 1024 ? -10 : window.innerWidth < 2560 ? -20 : -40,
+    [window.innerWidth],
+  );
+
+  console.log("dx", dx);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="text-lg 4k:text-5xl">
           הודעות שנשלחו בין {from} ל-{to}
         </CardTitle>
-        <CardDescription>הודעות שנשלחו לשם ההודעה</CardDescription>
+        <CardDescription className="text-sm 4k:text-2xl">
+          הודעות שנשלחו לשם ההודעה
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer
-          config={{ count: { label: "Count", color: "hsl(var(--primary))" } }}
+          config={{ count: { label: "כמות", color: "hsl(var(--primary))" } }}
         >
           <BarChart width={600} height={300} data={chartData}>
             <CartesianGrid vertical={false} />
@@ -57,8 +66,13 @@ export function DynamicChart({ data, from, to }: DynamicChartProps) {
               tickLine={false}
               tickMargin={1}
               axisLine={false}
+              className="text-xs 4k:text-2xl 4k:font-semibold"
             />
-            <YAxis allowDecimals={false} />
+            <YAxis
+              allowDecimals={false}
+              tick={{ dx }}
+              className="text-xs 4k:text-2xl 4k:font-semibold"
+            />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
@@ -67,7 +81,7 @@ export function DynamicChart({ data, from, to }: DynamicChartProps) {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm"></CardFooter>
+      <CardFooter className="flex-col items-start gap-2 text-sm 4k:text-3xl"></CardFooter>
     </Card>
   );
 }
