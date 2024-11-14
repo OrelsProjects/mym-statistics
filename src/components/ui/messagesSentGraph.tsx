@@ -48,7 +48,7 @@ export function DynamicChart({ data, from, to }: DynamicChartProps) {
       </CardHeader>
       <CardContent>
         <ChartContainer
-          config={{ count: { label: "Count", color: "hsl(var(--chart-1))" } }}
+          config={{ count: { label: "Count", color: "hsl(var(--primary))" } }}
         >
           <BarChart width={600} height={300} data={chartData}>
             <CartesianGrid vertical={false} />
@@ -63,7 +63,7 @@ export function DynamicChart({ data, from, to }: DynamicChartProps) {
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="count" fill="hsl(var(--chart-1))" radius={4} />
+            <Bar dataKey="count" fill="hsl(var(--primary))" radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>
