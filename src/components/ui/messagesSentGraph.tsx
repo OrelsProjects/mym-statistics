@@ -28,13 +28,15 @@ interface DynamicChartProps {
 export function DynamicChart({ data, from, to }: DynamicChartProps) {
   // Memoize the transformed data
   const chartData = useMemo(() => {
+    const maxItems =
+      window.innerWidth < 1024 ? 6 : window.innerWidth < 2560 ? 11 : 13;
     return data
       .map(item => ({
         label: item.title,
         count: item.count,
       }))
-      .slice(0, 10);
-  }, [data]);
+      .slice(0, maxItems);
+  }, [data, window.innerWidth]);
 
   // dx -> Set it to 10 if small screen, 20 if desktop, 40 if 4k
   const dx = useMemo(
