@@ -369,7 +369,7 @@ const MessagePage: React.FC<MessagePageProps> = () => {
         }}
         onClose={() => setMessageToEdit(null)}
       />
-      <Button asChild>
+      <Button asChild className="hidden md:block">
         <Link href="tel:+972543056286">Call</Link>
       </Button>
     </div>
