@@ -24,7 +24,7 @@ export async function GET(
       );
     }
 
-    const fromDate = moment(from).toDate();
+    const fromDate = moment(from).startOf("day").toDate();
     const toDate = moment(to).endOf("day").toDate();
 
     const group = await prisma.messageSent.groupBy({
