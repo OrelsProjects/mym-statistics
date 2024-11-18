@@ -79,14 +79,6 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
               pauseOnHover={false}
             />
           </div>
-          {/* <Button
-            className="absolute top-0 right-0 p-4 z-[5555] bg-primary text-white"
-            onClick={() => {
-              axios.post("/api/migrate");
-            }}
-          >
-            Migrate
-          </Button> */}
           <div className="w-full h-full flex flex-col relative z-10 scrollbar-hide md:scrollbar-visible mb-20 md:mb-0 md:px-4 overflow-auto">
             {user && <SettingsComponent />}
             {children}

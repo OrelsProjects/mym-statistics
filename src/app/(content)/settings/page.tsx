@@ -99,9 +99,9 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
         <span className="text-xl font-semibold">{user?.email}</span>
       </div>
       <Divider />
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2">
-          <span className="text-lg font-semibold">Appearance</span>
+          <span className="text-lg font-semibold">נראות</span>
           <div className="pl-2">
             <ThemeToggle />
           </div>
@@ -134,23 +134,23 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
             </div>
           </div>
         )}
-        <div className="flex flex-col gap-2 w-full justify-start">
-          <span className="text-lg font-semibold">Account</span>
+        <div className="flex flex-col gap-0 w-full justify-start">
+          <span className="text-lg font-semibold">חשבון</span>
           <div className="flex flex-col gap-1 pl-2">
             <Button
               variant="ghost"
               className="w-fit px-1 md:hover:bg-slate-400/40"
               onClick={handleSignOut}
             >
-              LOGOUT
+              התנתק
             </Button>
-            <Button
+            {/* <Button
               variant="link"
               className="w-fit px-1 md:hover:bg-destructive/40 md:hover:text-destructive-foreground hover:no-underline text-destructive/60 text-sm"
               onClick={handleDeleteUserRequest}
             >
-              DELETE
-            </Button>
+              מחק משתמש
+            </Button> */}
           </div>
         </div>
       </div>

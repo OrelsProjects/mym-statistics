@@ -47,6 +47,6 @@ export const BottomBarItems: NavigationBarItem[] = [
       <IoStatsChart className={cn(classNameActive, className)} />
     ),
     label: "סטטיסטקות",
-    href: "/home",
+    href: "/statistics",
   },
 ];

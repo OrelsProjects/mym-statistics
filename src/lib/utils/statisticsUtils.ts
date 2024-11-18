@@ -1,8 +1,12 @@
-import moment from "moment";
-
 export interface MessageSentStatistics {
   title: string;
   count: string;
+}
+
+export interface CallsStatistics {
+  incoming: number;
+  outgoing: number;
+  tagged: number;
 }
 
 // interface GroupedStatistics {

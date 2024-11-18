@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Label, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -45,7 +45,7 @@ export function DynamicChart({ data, from, to }: DynamicChartProps) {
     [window.innerWidth],
   );
 
-  console.log("dx", dx);
+  const isEmpty = useMemo(() => chartData.length === 0, [chartData]);
 
   return (
     <Card>
