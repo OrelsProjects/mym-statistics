@@ -45,18 +45,8 @@ export function DynamicChart({ data, from, to }: DynamicChartProps) {
     [window.innerWidth],
   );
 
-  const isEmpty = useMemo(() => chartData.length === 0, [chartData]);
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg 4k:text-5xl">
-          הודעות שנשלחו בין {from} ל-{to}
-        </CardTitle>
-        <CardDescription className="text-sm 4k:text-2xl">
-          הודעות שנשלחו לשם ההודעה
-        </CardDescription>
-      </CardHeader>
+    <Card className="!border-none !shadow-none">
       <CardContent>
         <ChartContainer
           config={{ count: { label: "כמות", color: "hsl(var(--primary))" } }}

@@ -113,7 +113,72 @@ export default function StatisticsDashboard() {
     "text-lg py-0 4k:font-medium 4k:text-4xl 4k:px-8 4k:py-2";
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10 items-center justify-start">
+      {/* Date selection tabs and calendar */}
+      <div className="w-full max-w-4xl 4k:max-w-screen-2xl flex mx-auto flex-col items-start gap-4">
+        <Tabs
+          value={dateRangeType}
+          onValueChange={value => {
+            setDateRangeType(value as DateRange);
+          }}
+        >
+          <TabsList className="4k:h-fit 4k:p-3">
+            <TabsTrigger
+              className={tabsTriggerClassname}
+              value="custom"
+              onClick={() => {
+                // Toggle calendar open/close if "custom" is already selected
+                if (dateRangeType === "custom") {
+                  setCalendarOpen(!calendarOpen);
+                } else {
+                  setCalendarOpen(true);
+                }
+                setDateRangeType("custom");
+              }}
+            >
+              בחירה
+            </TabsTrigger>
+            <TabsTrigger value="monthly" className={tabsTriggerClassname}>
+              חודשי
+            </TabsTrigger>
+            <TabsTrigger value="weekly" className={tabsTriggerClassname}>
+              שבועי
+            </TabsTrigger>
+            <TabsTrigger value="daily" className={tabsTriggerClassname}>
+              יומי
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="custom">
+            {calendarOpen && ( // Conditionally render calendar based on calendarOpen state
+              <div className="flex space-x-4 absolute z-50">
+                <Calendar
+                  mode="range"
+                  captionLayout="dropdown-buttons"
+                  fromYear={2020}
+                  toYear={2030}
+                  onClose={() => setCalendarOpen(false)} // Close action handled here
+                  selected={dateRange}
+                  onSelect={range => {
+                    if (range?.from && range?.to) {
+                      setDateRange({
+                        from: range.from,
+                        to: range.to,
+                      });
+                    }
+                  }}
+                  className="rounded-md border bg-background"
+                />
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+        <p className="text-lg 4k:text-4xl font-bold">
+          {moment(dateRange.from).format("YYYY/MM/DD")} -{" "}
+          {moment(dateRange.to).format("YYYY/MM/DD")}
+        </p>
+      </div>
+
+      {/* Messages Sent Statistics Card */}
       <Card className="w-full max-w-4xl 4k:max-w-screen-2xl mx-auto 4k:space-y-6">
         <CardHeader>
           <CardTitle className="text-lg 4k:text-5xl">
@@ -121,62 +186,6 @@ export default function StatisticsDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-start space-y-2 4k:space-y-16">
-          <Tabs
-            value={dateRangeType}
-            onValueChange={value => {
-              setDateRangeType(value as DateRange);
-            }}
-          >
-            <TabsList className="4k:h-fit 4k:p-3">
-              <TabsTrigger
-                className={tabsTriggerClassname}
-                value="custom"
-                onClick={() => {
-                  // Toggle calendar open/close if "custom" is already selected
-                  if (dateRangeType === "custom") {
-                    setCalendarOpen(!calendarOpen);
-                  } else {
-                    setCalendarOpen(true);
-                  }
-                  setDateRangeType("custom");
-                }}
-              >
-                בחירה
-              </TabsTrigger>
-              <TabsTrigger value="monthly" className={tabsTriggerClassname}>
-                חודשי
-              </TabsTrigger>
-              <TabsTrigger value="weekly" className={tabsTriggerClassname}>
-                שבועי
-              </TabsTrigger>
-              <TabsTrigger value="daily" className={tabsTriggerClassname}>
-                יומי
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="custom">
-              {calendarOpen && ( // Conditionally render calendar based on calendarOpen state
-                <div className="flex space-x-4 absolute z-50">
-                  <Calendar
-                    mode="range"
-                    captionLayout="dropdown-buttons"
-                    fromYear={2020}
-                    toYear={2030}
-                    onClose={() => setCalendarOpen(false)} // Close action handled here
-                    selected={dateRange}
-                    onSelect={range => {
-                      if (range?.from && range?.to) {
-                        setDateRange({
-                          from: range.from,
-                          to: range.to,
-                        });
-                      }
-                    }}
-                    className="rounded-md border bg-background"
-                  />
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
           <div className="w-full h-full relative z-10">
             <div
               className={cn(
@@ -200,6 +209,8 @@ export default function StatisticsDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Calls Statistics Card */}
       <Card className="w-full max-w-4xl 4k:max-w-screen-2xl mx-auto 4k:space-y-6">
         <CardHeader>
           <CardTitle className="text-lg 4k:text-5xl">סטטיסטיקת שיחות</CardTitle>
