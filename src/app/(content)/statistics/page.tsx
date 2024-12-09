@@ -231,7 +231,7 @@ export default function StatisticsDashboard() {
               <CustomPieChart
                 loading={loading}
                 title="שיחות יוצאות"
-                totalItemsTitle="סה״כ שיחות יוצאות"
+                totalItemsTitle="שיחות יוצאות"
                 items={[
                   {
                     label: "שיחות יוצאות",
@@ -244,7 +244,7 @@ export default function StatisticsDashboard() {
               <CustomPieChart
                 loading={loading}
                 title="שיחות נכנסות"
-                totalItemsTitle="סה״כ שיחות נכנסות"
+                totalItemsTitle="שיחות נכנסות"
                 items={[
                   {
                     label: "שיחות נכנסות",
@@ -257,7 +257,7 @@ export default function StatisticsDashboard() {
               <CustomPieChart
                 loading={loading}
                 title="שיחות מתוייגות"
-                totalItemsTitle="סה״כ שיחות מתוייגות"
+                totalItemsTitle="שיחות מתוייגות"
                 items={[
                   {
                     label: "שיחות מתוייגות",

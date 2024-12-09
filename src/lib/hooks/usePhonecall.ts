@@ -1,3 +1,5 @@
+"use client";
+
 import { OngoingCall } from "@prisma/client";
 import { useAppDispatch, useAppSelector } from "./redux";
 import {
@@ -11,6 +13,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { selectAuth } from "@/lib/features/auth/authSlice";
 import { useEffect, useRef } from "react";
 import { Logger } from "../../logger";
+import React from "react";
 
 export default function usePhonecall() {
   const dispatch = useAppDispatch();
@@ -25,7 +28,6 @@ export default function usePhonecall() {
   }, [user]);
 
   async function getLatestOngoingCall() {
-    console.log("REFRESHING");
     if (loading) return;
     try {
       if (!db || !userRef.current) {

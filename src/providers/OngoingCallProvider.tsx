@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { IoIosRefresh } from "react-icons/io";
 import Loading from "@/components/ui/loading";
@@ -10,6 +10,7 @@ import { selectAuth } from "@/lib/features/auth/authSlice";
 import { setOngoingCall } from "@/lib/features/ongoingCall/ongoingCallSlice";
 import { Logger } from "@/logger";
 import usePhonecall from "@/lib/hooks/usePhonecall";
+import { toast } from "react-toastify";
 
 export function OngoingCallProvider() {
   const dispatch = useAppDispatch();
@@ -20,7 +21,17 @@ export function OngoingCallProvider() {
 
   const { getLatestOngoingCall } = usePhonecall();
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const loadingToastId = toast.loading("טוען שיחה פעילה");
+    if (!loading) {
+      toast.dismiss(loadingToastId);
+    }
+    return () => {
+      toast.dismiss(loadingToastId);
+    };
+  }, [loading]);
+
+  useEffect(() => {
     let unsubscribe: () => void = () => {};
     if (db && user && user.id) {
       Logger.debug("Subscribing to ongoing call snapshot", {
