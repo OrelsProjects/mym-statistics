@@ -13,11 +13,19 @@ import {
   setUserData,
 } from "../features/auth/authSlice";
 import { Folder, Message } from "@prisma/client";
+import { useRef } from "react";
+
+export interface MessagePosition {
+  id: string;
+  position: number;
+}
 
 export default function useMessage() {
   const { isDataFetched, loadingData, data, folders } =
     useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
+
+  const loading = useRef<{ [key: string]: boolean }>({});
 
   const getMessagesData = async () => {
     if (isDataFetched || loadingData) {
@@ -139,5 +147,39 @@ export default function useMessage() {
     }
   };
 
-  return { getMessagesData, updateMessage, createMessage, deleteMessage };
+  const updateMessagesPosition = async (
+    messagesPosition: MessagePosition[],
+    localUpdate?: boolean,
+  ) => {
+    if (loading.current["updateMessagesPosition"]) return;
+    loading.current["updateMessagesPosition"] = true;
+    const oldData = [...data];
+
+    try {
+      const optimisticUpdate = (messagesPosition: MessagePosition[]) => {
+        const newData = data.map(d => {
+          const newPosition = messagesPosition.find(m => m.id === d.id);
+          return newPosition ? { ...d, position: newPosition.position } : d;
+        });
+        dispatch(setUserData(newData));
+      };
+      optimisticUpdate(messagesPosition);
+      if (localUpdate) return;
+      await axios.patch(`api/messages/position`, messagesPosition);
+    } catch (error: any) {
+      console.error(error);
+      dispatch(setUserData(oldData));
+      throw error;
+    } finally {
+      loading.current["updateMessagesPosition"] = false;
+    }
+  };
+
+  return {
+    getMessagesData,
+    updateMessage,
+    createMessage,
+    deleteMessage,
+    updateMessagesPosition,
+  };
 }

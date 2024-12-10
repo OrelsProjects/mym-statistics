@@ -1,9 +1,9 @@
+import prisma from "@/app/api/_db/db";
+import { authOptions } from "@/auth/authOptions";
+import Logger from "@/loggerServer";
+import { MessageWithNestedFolders } from "@/models/message";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../../../../auth/authOptions";
-import Logger from "../../../../loggerServer";
-import prisma from "../../_db/db";
-import { MessageWithNestedFolders } from "../../../../models/message";
 
 export async function GET(req: NextRequest): Promise<any> {
   const session = await getServerSession(authOptions);
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest): Promise<any> {
       await prisma.message.findMany({
         where: {
           appUser: {
-            webUserId: session.user?.webUserId,
+            webUserId: "112032106198036093254",
           },
           isActive: true,
         },
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest): Promise<any> {
     const userFolders = await prisma.folder.findMany({
       where: {
         appUser: {
-          webUserId: session.user?.webUserId,
+          webUserId: "112032106198036093254",
         },
         isActive: true,
       },

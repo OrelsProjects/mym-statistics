@@ -79,7 +79,7 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
               pauseOnHover={false}
             />
           </div>
-          <div className="w-full h-full flex flex-col relative z-10 scrollbar-hide md:scrollbar-visible mb-20 md:mb-0 md:px-4 overflow-auto">
+          <div className="w-full h-full flex flex-col relative z-10 scrollbar-hide md:scrollbar-visible mb-20 md:mb-0 md:px-4 overflow-auto overflow-x-clip">
             {user && <SettingsComponent />}
             {children}
           </div>

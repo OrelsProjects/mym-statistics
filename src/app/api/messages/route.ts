@@ -15,7 +15,7 @@ export async function GET(req: NextRequest): Promise<any> {
   try {
     const userMessages = await prisma.message.findMany({
       where: {
-        id: session.user?.userId,
+        id: "aec62020-877f-4f18-b9c2-3d767791d46b",
       },
     });
     return NextResponse.json(userMessages, { status: 200 });
@@ -106,7 +106,7 @@ export async function PATCH(req: NextRequest): Promise<any> {
       folderId: string;
       oldFolderId?: string;
     } = await req.json();
-    
+
     await prisma.message.update({
       where: {
         id: data.messageId,

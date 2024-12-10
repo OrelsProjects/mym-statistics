@@ -79,7 +79,7 @@ const NavigationBar: React.FC<NavigationBar> = ({ ...props }) => {
 
   const MobileNavigationBar = () => (
     <div
-      className="fixed lg:hidden inset-x-0 bottom-0 lg:left-0 z-40 pb-[calc(max(env(safe-area-inset-bottom), 16px) - 16px)] bg-base-200 border-t border-base-content/10 select-none"
+      className="fixed lg:hidden inset-x-0 bottom-0 lg:left-0 z-40 pb-[calc(max(env(safe-area-inset-bottom), 16px) - 16px)] bg-base-200 border-t border-base-content/10 select-none z-50"
       ref={props.ref}
     >
       <div className="h-16 w-full flex flex-row">

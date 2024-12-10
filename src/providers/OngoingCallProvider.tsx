@@ -22,12 +22,12 @@ export function OngoingCallProvider() {
   const { getLatestOngoingCall } = usePhonecall();
 
   useEffect(() => {
-    const loadingToastId = toast.loading("טוען שיחה פעילה");
+    // const loadingToastId = toast.loading("טוען שיחה פעילה");
     if (!loading) {
-      toast.dismiss(loadingToastId);
+      // toast.dismiss(loadingToastId);
     }
     return () => {
-      toast.dismiss(loadingToastId);
+      // toast.dismiss(loadingToastId);
     };
   }, [loading]);
 

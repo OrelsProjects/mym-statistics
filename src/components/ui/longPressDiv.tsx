@@ -11,12 +11,14 @@ export interface LongPressDivProps
 export default function LongPressDiv({
   onLongPress,
   onClick,
+  onDoubleClick,
   ...props
 }: LongPressDivProps) {
   const [timer, setTimer] = React.useState<number | undefined>(undefined);
   const longPressed = useRef(false);
 
   const handleTouchStart = () => {
+    console.log("touch start");
     setTimer(
       window.setTimeout(() => {
         longPressed.current = true;
@@ -25,19 +27,21 @@ export default function LongPressDiv({
     );
   };
 
-  const handleTouchEnd = () => {
-    if (timer) {
-      clearTimeout(timer);
-    }
-  };
-
-  const handleOnClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleTouchEnd = (event: any) => {
+    console.log("touch end");
     if (longPressed.current) {
       longPressed.current = false;
       return;
     } else {
       onClick?.(event);
     }
+    if (timer) {
+      clearTimeout(timer);
+    }
+  };
+
+  const handleOnClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    console.log("click" + longPressed.current);
   };
 
   return (
