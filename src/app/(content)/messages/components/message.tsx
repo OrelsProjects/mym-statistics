@@ -15,7 +15,7 @@ export const MessageComponent = ({
 }) => (
   <LongPressDiv
     className={cn(
-      "h-full w-full flex aspect-square flex-col justify-center items-center rounded-lg shadow-lg dark:bg-muted p-2 hover:cursor-pointer",
+      "h-full w-full flex aspect-square flex-col justify-center items-center rounded-lg shadow-lg dark:bg-muted p-2 hover:cursor-pointer transition-all duration-300",
       className,
     )}
     onClick={() => onClick && onClick(message)}
@@ -27,3 +27,4 @@ export const MessageComponent = ({
     <h3 className="line-clamp-1 text-center 4k:text-4xl">{message.title}</h3>
   </LongPressDiv>
 );
+

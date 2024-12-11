@@ -1,7 +1,7 @@
 import { MessageComponent } from "@/app/(content)/messages/components/message";
 import SortableItem from "@/app/(content)/messages/components/sortableItem";
 import { Button } from "@/components/ui/button";
-import useMessage, { MessagePosition } from "@/lib/hooks/useMessage";
+import useMessage from "@/lib/hooks/useMessage";
 import {
   DndContext,
   closestCenter,
@@ -171,7 +171,9 @@ export const MessagesContainer = ({
           items={sortedMessages.map(msg => msg.id)}
           strategy={rectSortingStrategy}
         >
-          <div className="grid grid-cols-2 md:grid-cols-8 4k:grid-cols-10 gap-4">
+          <div
+            className={`grid grid-cols-2 md:grid-cols-8 4k:grid-cols-10 gap-4 ${!isLocked ? "draggable-grid" : ""}`}
+          >
             {sortedMessages.map(message => (
               <SortableItem
                 key={message.id}
@@ -179,10 +181,12 @@ export const MessagesContainer = ({
                 disabled={isLocked}
               >
                 <MessageComponent
-                  className={`touch-none ${isLocked ? "cursor-default" : "cursor-move"}`}
+                  className={`touch-none ${isLocked ? "cursor-default" : "cursor-move"} ${!isLocked ? "draggable-item" : ""}`}
                   message={message}
-                  onClick={handleMessageClick}
-                  onLongPress={() => copyToClipboard(message)}
+                  onClick={isLocked ? handleMessageClick : undefined}
+                  onLongPress={
+                    isLocked ? () => copyToClipboard(message) : undefined
+                  }
                 />
               </SortableItem>
             ))}
