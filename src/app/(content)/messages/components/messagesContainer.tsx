@@ -87,7 +87,6 @@ export const MessagesContainer = ({
 
   const handleDragMove = (event: DragMoveEvent) => {
     if (isLocked) return;
-    setIsDragActive(true);
     const newCanCopyToClipboard =
       Math.abs(event.delta.x) < 10 && Math.abs(event.delta.y) < 10;
     copyToClipboardRef.current = newCanCopyToClipboard;
@@ -167,6 +166,7 @@ export const MessagesContainer = ({
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
+        onDragStart={() => setIsDragActive(true)}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
       >
