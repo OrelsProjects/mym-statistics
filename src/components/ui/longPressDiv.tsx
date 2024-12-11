@@ -28,20 +28,13 @@ export default function LongPressDiv({
   };
 
   const handleTouchEnd = (event: any) => {
-    console.log("touch end");
-    if (longPressed.current) {
-      longPressed.current = false;
-      return;
-    } else {
-      onClick?.(event);
-    }
     if (timer) {
       clearTimeout(timer);
     }
   };
 
   const handleOnClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    console.log("click" + longPressed.current);
+    onClick?.(event);
   };
 
   return (
@@ -49,7 +42,6 @@ export default function LongPressDiv({
       onTouchStart={handleTouchStart}
       onMouseDown={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      onMouseUp={handleTouchEnd}
       onClick={handleOnClick}
       {...props}
     >

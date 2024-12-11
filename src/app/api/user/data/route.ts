@@ -16,7 +16,8 @@ export async function GET(req: NextRequest): Promise<any> {
       await prisma.message.findMany({
         where: {
           appUser: {
-            webUserId: session.user?.webUserId,
+            id: "aec62020-877f-4f18-b9c2-3d767791d46b",
+            // webUserId: session.user?.webUserId,
           },
           isActive: true,
         },
@@ -40,7 +41,8 @@ export async function GET(req: NextRequest): Promise<any> {
     const userFolders = await prisma.folder.findMany({
       where: {
         appUser: {
-          webUserId: session.user?.webUserId,
+          id: "aec62020-877f-4f18-b9c2-3d767791d46b",
+          // webUserId: session.user?.webUserId,
         },
         isActive: true,
       },

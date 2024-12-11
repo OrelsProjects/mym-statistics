@@ -18,7 +18,7 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Message } from "@prisma/client";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, isDragActive, motion } from "framer-motion";
 import { Lock, Unlock, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
@@ -33,6 +33,7 @@ export const MessagesContainer = ({
   const [sortedMessages, setSortedMessages] = useState(messages);
   const { updateMessagesPosition } = useMessage();
   const [changesMade, setChangesMade] = useState(false);
+  const [isDragActive, setIsDragActive] = useState(false);
   const [loadingSaveChanges, setLoadingSaveChanges] = useState(false);
   const copyToClipboardRef = useRef(true);
   const [isLocked, setIsLocked] = useState(true);
@@ -51,6 +52,7 @@ export const MessagesContainer = ({
 
   const handleDragEnd = ({ active, over }: { active: any; over: any }) => {
     if (isLocked) return;
+    setIsDragActive(false);
     copyToClipboardRef.current = true;
     if (active.id !== over?.id) {
       setSortedMessages(prev => {
@@ -85,6 +87,7 @@ export const MessagesContainer = ({
 
   const handleDragMove = (event: DragMoveEvent) => {
     if (isLocked) return;
+    setIsDragActive(true);
     const newCanCopyToClipboard =
       Math.abs(event.delta.x) < 10 && Math.abs(event.delta.y) < 10;
     copyToClipboardRef.current = newCanCopyToClipboard;
@@ -181,7 +184,7 @@ export const MessagesContainer = ({
                 disabled={isLocked}
               >
                 <MessageComponent
-                  className={`touch-none ${isLocked ? "cursor-default" : "cursor-move"} ${!isLocked ? "draggable-item" : ""}`}
+                  className={`${isLocked ? "cursor-default" : "cursor-move"} ${!isLocked ? "draggable-item" : ""} ${isDragActive ? " touch-none" : ""}`}
                   message={message}
                   onClick={isLocked ? handleMessageClick : undefined}
                   onLongPress={
