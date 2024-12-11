@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Message } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { Lock, Unlock, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 
@@ -33,7 +33,9 @@ export const MessagesContainer = ({
   const [sortedMessages, setSortedMessages] = useState(messages);
   const { updateMessagesPosition } = useMessage();
   const [changesMade, setChangesMade] = useState(false);
+  const [loadingSaveChanges, setLoadingSaveChanges] = useState(false);
   const copyToClipboardRef = useRef(true);
+  const [isLocked, setIsLocked] = useState(true);
 
   useEffect(() => {
     const sortedMessages = messages.sort((a, b) => a.position - b.position);
@@ -48,6 +50,7 @@ export const MessagesContainer = ({
   );
 
   const handleDragEnd = ({ active, over }: { active: any; over: any }) => {
+    if (isLocked) return;
     copyToClipboardRef.current = true;
     if (active.id !== over?.id) {
       setSortedMessages(prev => {
@@ -64,33 +67,24 @@ export const MessagesContainer = ({
     }
   };
 
-  const onCommitChanges = () => {
-    toast.promise(
-      updateMessagesPosition(
+  const onCommitChanges = async () => {
+    setLoadingSaveChanges(true);
+    try {
+      await updateMessagesPosition(
         sortedMessages.map((item, index) => ({ id: item.id, position: index })),
-      ),
-      {
-        pending: "שומר...",
-        success: {
-          render: () => {
-            setChangesMade(false);
-            return "השינויים נשמרו בהצלחה";
-          },
-        },
-        error: {
-          render: () => {
-            setChangesMade(false);
-            return "שגיאה בשמירה";
-          },
-        },
-      },
-      {
+      );
+      setChangesMade(false);
+    } catch (error) {
+      toast("שגיאה בשמירת השינויים", {
         rtl: true,
-      },
-    );
+      });
+    } finally {
+      setLoadingSaveChanges(false);
+    }
   };
 
   const handleDragMove = (event: DragMoveEvent) => {
+    if (isLocked) return;
     const newCanCopyToClipboard =
       Math.abs(event.delta.x) < 10 && Math.abs(event.delta.y) < 10;
     copyToClipboardRef.current = newCanCopyToClipboard;
@@ -112,6 +106,10 @@ export const MessagesContainer = ({
     }
   };
 
+  const toggleLock = () => {
+    setIsLocked(prev => !prev);
+  };
+
   return (
     <div className="h-full w-full relative">
       <AnimatePresence>
@@ -127,12 +125,15 @@ export const MessagesContainer = ({
             <Button
               className="absolute right-4 bg-transparent shadow-none border-none md:shadow-md md:border md:border-muted-foreground 4k:text-3xl 4k:px-8 4k:py-12"
               variant="outline"
+              disabled={loadingSaveChanges}
               onClick={() => setChangesMade(false)}
             >
               <X className="h-6 w-6 4k:!w-12 4k:!h-12" />
             </Button>
             <Button
               className="4k:text-3xl 4k:px-8 4k:py-12 4k:rounded-xl"
+              disabled={loadingSaveChanges}
+              loading={loadingSaveChanges}
               onClick={onCommitChanges}
             >
               שמור שינויים
@@ -143,6 +144,23 @@ export const MessagesContainer = ({
           </motion.div>
         )}
       </AnimatePresence>
+      <div className="flex justify-start mb-4">
+        <Button
+          onClick={toggleLock}
+          className="4k:text-3xl 4k:px-8 4k:py-12 4k:rounded-xl"
+          variant="outline"
+        >
+          {isLocked ? (
+            <>
+              <Lock className="mr-2 h-4 w-4" /> גרירה
+            </>
+          ) : (
+            <>
+              <Unlock className="mr-2 h-4 w-4" /> נעל גרירה
+            </>
+          )}
+        </Button>
+      </div>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -151,13 +169,17 @@ export const MessagesContainer = ({
       >
         <SortableContext
           items={sortedMessages.map(msg => msg.id)}
-          strategy={rectSortingStrategy} // Grid sorting strategy
+          strategy={rectSortingStrategy}
         >
           <div className="grid grid-cols-2 md:grid-cols-8 4k:grid-cols-10 gap-4">
             {sortedMessages.map(message => (
-              <SortableItem key={message.id} id={message.id}>
+              <SortableItem
+                key={message.id}
+                id={message.id}
+                disabled={isLocked}
+              >
                 <MessageComponent
-                  className="touch-none"
+                  className={`touch-none ${isLocked ? "cursor-default" : "cursor-move"}`}
                   message={message}
                   onClick={handleMessageClick}
                   onLongPress={() => copyToClipboard(message)}
