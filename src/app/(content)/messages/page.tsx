@@ -123,7 +123,18 @@ const MessagePage: React.FC<MessagePageProps> = () => {
       <Button
         variant="secondary"
         className="4k:py-8 4k:text-2xl"
-        onClick={() => toast("Add message modal is not implemented here")}
+        onClick={() => {
+          setMessageToEdit({
+            id: "",
+            userId: "",
+            title: "",
+            shortTitle: "",
+            body: "",
+            position: 0,
+            timesUsed: 0,
+            isActive: true,
+          })
+        }}
       >
         הוסף הודעה
       </Button>
