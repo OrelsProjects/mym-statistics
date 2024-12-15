@@ -17,6 +17,7 @@ import { useRef } from "react";
 
 export interface MessagePosition {
   id: string;
+  title: string,
   position: number;
 }
 

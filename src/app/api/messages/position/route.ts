@@ -15,6 +15,11 @@ export async function PATCH(
   }
   try {
     const body = (await req.json()) as MessagePosition[];
+    Logger.info("Updating messages position", session.user?.userId, {
+      data: {
+        body,
+      },
+    });
     await prisma.$transaction(
       body.map(({ id, position }) =>
         prisma.message.update({

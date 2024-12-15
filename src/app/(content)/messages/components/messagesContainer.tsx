@@ -61,7 +61,11 @@ export const MessagesContainer = ({
         const newArray = arrayMove(prev, oldIndex, newIndex);
         setChangesMade(true);
         updateMessagesPosition(
-          newArray.map((item, index) => ({ id: item.id, position: index })),
+          newArray.map((item, index) => ({
+            id: item.id,
+            title: item.title,
+            position: index,
+          })),
           true,
         );
         return newArray;
@@ -73,7 +77,11 @@ export const MessagesContainer = ({
     setLoadingSaveChanges(true);
     try {
       await updateMessagesPosition(
-        sortedMessages.map((item, index) => ({ id: item.id, position: index })),
+        sortedMessages.map((item, index) => ({
+          id: item.id,
+          title: item.title,
+          position: index,
+        })),
       );
       setChangesMade(false);
     } catch (error) {
