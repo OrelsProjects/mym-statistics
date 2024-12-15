@@ -38,9 +38,9 @@ const logger: () => Logger = () => {
     } catch (error: any) {
       console.log("Error logging", error);
     }
-    if (process.env.NODE_ENV !== "production") {
+    // if (process.env.NODE_ENV !== "production") {
       console.log(message, user_id, data);
-    }
+    // }
   };
 
   return {
