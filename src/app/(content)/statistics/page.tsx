@@ -7,6 +7,7 @@ import {
   endOfWeek,
   subMonths,
   startOfMonth,
+  startOfDay,
 } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
@@ -84,15 +85,15 @@ export default function StatisticsDashboard() {
     let from: Date, to: Date;
     switch (dateRangeType) {
       case "daily":
-        from = startOfWeek(now);
+        from = startOfDay(now);
         to = now;
         break;
       case "weekly":
-        from = startOfMonth(now);
+        from = startOfWeek(now);
         to = endOfWeek(now);
         break;
       case "monthly":
-        from = subMonths(now, 1);
+        from = startOfMonth(now);
         to = now;
         break;
       default:
@@ -109,6 +110,13 @@ export default function StatisticsDashboard() {
     }
   }, [dateRange, dateRangeType]);
 
+  const handleDateChange = (key: "from" | "to", value: Date) => {
+    setDateRange(prev => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   const tabsTriggerClassname =
     "text-lg py-0 4k:font-medium 4k:text-4xl 4k:px-8 4k:py-2";
 
@@ -122,7 +130,7 @@ export default function StatisticsDashboard() {
             setDateRangeType(value as DateRange);
           }}
         >
-          <TabsList className="4k:h-fit 4k:p-3">
+          <TabsList className="4k:h-fit 4k:p-3 flex w-fit ml-auto">
             <TabsTrigger
               className={tabsTriggerClassname}
               value="custom"
@@ -139,35 +147,40 @@ export default function StatisticsDashboard() {
               בחירה
             </TabsTrigger>
             <TabsTrigger value="monthly" className={tabsTriggerClassname}>
-              חודשי
+              החודש
             </TabsTrigger>
             <TabsTrigger value="weekly" className={tabsTriggerClassname}>
-              שבועי
+              השבוע
             </TabsTrigger>
             <TabsTrigger value="daily" className={tabsTriggerClassname}>
-              יומי
+              היום
             </TabsTrigger>
           </TabsList>
           <TabsContent value="custom">
-            {calendarOpen && ( // Conditionally render calendar based on calendarOpen state
-              <div className="flex space-x-4 absolute z-50">
-                <Calendar
-                  mode="range"
-                  captionLayout="dropdown-buttons"
-                  fromYear={2020}
-                  toYear={2030}
-                  onClose={() => setCalendarOpen(false)} // Close action handled here
-                  selected={dateRange}
-                  onSelect={range => {
-                    if (range?.from && range?.to) {
-                      setDateRange({
-                        from: range.from,
-                        to: range.to,
-                      });
+            {dateRangeType === "custom" && (
+              <div className="flex flex-row gap-6" dir="rtl">
+                <div>
+                  <h3 className="text-lg font-bold ml-auto">מתאריך</h3>
+                  <Calendar
+                    mode="single"
+                    selected={dateRange.from}
+                    onSelect={date =>
+                      handleDateChange("from", date || new Date())
                     }
-                  }}
-                  className="rounded-md border bg-background"
-                />
+                    className="rounded-md border bg-background"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">עד תאריך</h3>
+                  <Calendar
+                    mode="single"
+                    selected={dateRange.to}
+                    onSelect={date =>
+                      handleDateChange("to", date || new Date())
+                    }
+                    className="rounded-md border bg-background"
+                  />
+                </div>
               </div>
             )}
           </TabsContent>
