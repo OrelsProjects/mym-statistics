@@ -9,11 +9,10 @@ import {
   setOngoingCall,
 } from "../features/ongoingCall/ongoingCallSlice";
 import { db } from "@/../firebase.config";
-import { doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import { selectAuth } from "@/lib/features/auth/authSlice";
 import { useEffect, useRef } from "react";
 import { Logger } from "../../logger";
-import React from "react";
 
 export default function usePhonecall() {
   const dispatch = useAppDispatch();
@@ -59,6 +58,31 @@ export default function usePhonecall() {
     }
   }
 
+  async function clearLatestOngoingCall() {
+    if (loading) return;
+    try {
+      if (!db || !userRef.current) {
+        Logger.error("DB or user is not defined");
+        return;
+      }
+      dispatch(setLoading(true));
+      const phoneCallDocRef = doc(
+        db,
+        "users",
+        userRef.current.id,
+        "ongoingCalls",
+        "latest",
+      );
+      await deleteDoc(phoneCallDocRef);
+      dispatch(setOngoingCall(undefined));
+    } catch (error) {
+      console.error("Error clearing latest ongoing call", error);
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }
+
   async function sendWhatsapp(phoneNumber: string, body: string) {
     try {
       let formattedNumber = phoneNumber.replace(/\D/g, "");
@@ -95,5 +119,6 @@ export default function usePhonecall() {
     getLatestOngoingCall,
     updateOngoingCall,
     sendWhatsapp,
+    clearLatestOngoingCall,
   };
 }

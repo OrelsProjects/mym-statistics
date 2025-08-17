@@ -11,6 +11,7 @@ import { setOngoingCall } from "@/lib/features/ongoingCall/ongoingCallSlice";
 import { Logger } from "@/logger";
 import usePhonecall from "@/lib/hooks/usePhonecall";
 import { toast } from "react-toastify";
+import { IoTrash } from "react-icons/io5";
 
 export function OngoingCallProvider() {
   const dispatch = useAppDispatch();
@@ -19,7 +20,7 @@ export function OngoingCallProvider() {
     state => state.ongoingCall,
   );
 
-  const { getLatestOngoingCall } = usePhonecall();
+  const { getLatestOngoingCall, clearLatestOngoingCall } = usePhonecall();
 
   useEffect(() => {
     // const loadingToastId = toast.loading("טוען שיחה פעילה");
@@ -68,17 +69,22 @@ export function OngoingCallProvider() {
 
   return (
     <div className="w-full absolute top-0 flex flex-row justify-center items-center gap-2 4k:text-5xl">
+      {ongoingCall
+        ? ongoingCall.contactName || ongoingCall.number
+        : "אין שיחה פעילה"}
       {loading ? (
         <Loading spinnerClassName="w-5 h-5 4k:w-10 4k:h-10 fill-foreground" />
       ) : ongoingCall ? (
-        ongoingCall.contactName || ongoingCall.number
+        <IoTrash
+          className="cursor-pointer w-5 h-5 4k:w-10 4k:h-10"
+          onClick={clearLatestOngoingCall}
+        />
       ) : (
-        "אין שיחה פעילה"
+        <IoIosRefresh
+          className="cursor-pointer w-5 h-5 4k:w-10 4k:h-10"
+          onClick={getLatestOngoingCall}
+        />
       )}
-      <IoIosRefresh
-        className="cursor-pointer w-5 h-5 4k:w-10 4k:h-10"
-        onClick={getLatestOngoingCall}
-      />
     </div>
   );
 }

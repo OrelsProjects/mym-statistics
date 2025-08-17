@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
 import { Button } from "@/components/ui/button";
 import useAuth from "@/lib/hooks/useAuth";
@@ -16,17 +16,16 @@ import Divider from "@/components/ui/divider";
 interface SettingsProps {}
 
 const SettingsScreen: React.FC<SettingsProps> = () => {
-  const dispatch = useAppDispatch();
   const { user } = useAppSelector(state => state.auth);
   const { deleteUser, signOut } = useAuth();
   const { initNotifications: initUserToken, requestNotificationsPermission } =
     useNotification();
-  const [settings, setSettings] =
-    useState();
-    // user?.settings ?? {
-    //   showNotifications: false,
-    //   soundEffects: true,
-    // },
+  const [settings, setSettings] = useState();
+  const [isCopyingMessages, setIsCopyingMessages] = useState(false);
+  // user?.settings ?? {
+  //   showNotifications: false,
+  //   soundEffects: true,
+  // },
 
   const changeNotificationTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -42,6 +41,24 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
       // setSettings(user?.settings);
     }
   }, [user]);
+
+  const isNoy = useMemo(
+    () => user?.webUserId === "110129537237345771893",
+    [user],
+  );
+
+  const copyMessagesFromDad = async () => {
+    setIsCopyingMessages(true);
+    try {
+      await axios.post("/api/user/noy/copy-from-dad");
+      toast.success("הודעות עותקו מאבא, תרענני");
+      window.location.reload();
+    } catch (e) {
+      toast.error("העתקת הודעות נכשלה");
+    } finally {
+      setIsCopyingMessages(false);
+    }
+  };
 
   const updateNotificationSettings = (showNotifications: boolean) => {
     if (changeNotificationTimeout.current) {
@@ -131,6 +148,23 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
                   Enable notifications
                 </Button>
               )}
+            </div>
+          </div>
+        )}
+        {isNoy && (
+          <div>
+            <span className="text-lg font-semibold">
+              תלחצי פה כדי להעתיק את ההודעות מאבא
+            </span>
+            <div className="pl-2">
+              <Button
+                variant="default"
+                className="w-fit px-2"
+                onClick={copyMessagesFromDad}
+                disabled={isCopyingMessages}
+              >
+                {isCopyingMessages ? "מעתיק..." : "העתק מאבא"}
+              </Button>
             </div>
           </div>
         )}
