@@ -9,9 +9,8 @@ const noyId = "f7b10db2-657b-4784-946e-cb91d57b36ce";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  //   if (!session || session.user?.userId !== noyId) {
-  //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  //   }
+
+  const idToCopyTo = session?.user?.userId || noyId;
 
   const dadMessages = await prisma.message.findMany({
     where: {
@@ -55,12 +54,12 @@ export async function POST(request: NextRequest) {
 
   const noyMessages = await prisma.message.findMany({
     where: {
-      userId: noyId,
+      userId: idToCopyTo,
     },
   });
   const noyFolders = await prisma.folder.findMany({
     where: {
-      userId: noyId,
+      userId: idToCopyTo,
     },
   });
 
@@ -69,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     return {
       ...rest,
-      userId: noyId,
+      userId: idToCopyTo,
     };
   });
 
@@ -77,7 +76,7 @@ export async function POST(request: NextRequest) {
     const { id, ...rest } = folder;
     return {
       ...rest,
-      userId: noyId,
+      userId: idToCopyTo,
     };
   });
 
@@ -111,13 +110,13 @@ export async function POST(request: NextRequest) {
     await prisma.$transaction(async tx => {
       await tx.folder.deleteMany({
         where: {
-          userId: noyId,
+          userId: idToCopyTo,
         },
       });
 
       await tx.message.deleteMany({
         where: {
-          userId: noyId,
+          userId: idToCopyTo,
         },
       });
 
@@ -132,13 +131,13 @@ export async function POST(request: NextRequest) {
 
     const messagesCreated = await prisma.message.findMany({
       where: {
-        userId: noyId,
+        userId: idToCopyTo,
       },
     });
 
     const foldersCreated = await prisma.folder.findMany({
       where: {
-        userId: noyId,
+        userId: idToCopyTo,
       },
     });
 
@@ -155,8 +154,8 @@ export async function POST(request: NextRequest) {
           folderId: folder.id,
           isActive: true,
           createdAt: new Date(),
-          userIdMessage: noyId,
-          userIdFolder: noyId,
+          userIdMessage: idToCopyTo,
+          userIdFolder: idToCopyTo,
         });
       }
     }

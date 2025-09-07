@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
+import { useAppSelector } from "@/lib/hooks/redux";
 import { Button } from "@/components/ui/button";
 import useAuth from "@/lib/hooks/useAuth";
 import { toast } from "react-toastify";
@@ -42,8 +42,10 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
     }
   }, [user]);
 
-  const isNoy = useMemo(
-    () => user?.webUserId === "110129537237345771893",
+  const isNoyOrDudi = useMemo(
+    () =>
+      user?.webUserId === "110129537237345771893" ||
+      user?.webUserId === "107925800075208384420",
     [user],
   );
 
@@ -51,7 +53,6 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
     setIsCopyingMessages(true);
     try {
       await axios.post("/api/user/noy/copy-from-dad");
-      toast.success("הודעות עותקו מאבא, תרענני");
       window.location.reload();
     } catch (e) {
       toast.error("העתקת הודעות נכשלה");
@@ -151,10 +152,10 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
             </div>
           </div>
         )}
-        {isNoy && (
+        {isNoyOrDudi && (
           <div>
             <span className="text-lg font-semibold">
-              תלחצי פה כדי להעתיק את ההודעות מאבא
+              לחץ פה כדי להעתיק את ההודעות מאיציק
             </span>
             <div className="pl-2">
               <Button
@@ -163,7 +164,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
                 onClick={copyMessagesFromDad}
                 disabled={isCopyingMessages}
               >
-                {isCopyingMessages ? "מעתיק..." : "העתק מאבא"}
+                {isCopyingMessages ? "מעתיק..." : "העתק מאיציק"}
               </Button>
             </div>
           </div>
