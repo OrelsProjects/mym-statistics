@@ -45,7 +45,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
   const isNoyOrDudi = useMemo(
     () =>
       user?.webUserId === "110129537237345771893" ||
-      user?.webUserId === "107925800075208384420",
+      user?.webUserId === "107925800075208384420" || true,
     [user],
   );
 
