@@ -70,8 +70,20 @@ export default function useStatistics() {
     }
   };
 
+  const markCallsHandled = async (ids: string[]) => {
+    try {
+      await axios.post("/api/statistics/calls/handled", { ids });
+    } catch (error) {
+      if (!axios.isCancel(error)) {
+        Logger.error("Error marking calls handled", { data: { error } });
+      }
+      throw error;
+    }
+  };
+
   return {
     getMessagesSentStatistics,
     getCallsStatistics,
+    markCallsHandled,
   };
 }

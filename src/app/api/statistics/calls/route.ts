@@ -35,25 +35,32 @@ export async function GET(req: NextRequest): Promise<NextResponse<any>> {
     // Calls are "in the period" by start time. Follow-ups after `to` are
     // loaded too so a callback made later still clears an older missed call.
     // endDate is not used: missed calls often have no reliable end.
-    const calls = await prisma.phoneCall.findMany({
-      where: {
-        userId: auth.userId,
-        startDate: { gte: fromDate },
-      },
-      select: {
-        id: true,
-        number: true,
-        contactName: true,
-        startDate: true,
-        type: true,
-        isAnswered: true,
-        messagesSent: {
-          select: {
-            id: true,
+    // Manual marks are per user, so one account cannot hide another's calls.
+    const [calls, marks] = await Promise.all([
+      prisma.phoneCall.findMany({
+        where: {
+          userId: auth.userId,
+          startDate: { gte: fromDate },
+        },
+        select: {
+          id: true,
+          number: true,
+          contactName: true,
+          startDate: true,
+          type: true,
+          isAnswered: true,
+          messagesSent: {
+            select: {
+              id: true,
+            },
           },
         },
-      },
-    });
+      }),
+      prisma.handledCallMark.findMany({
+        where: { userId: auth.userId },
+        select: { phoneCallId: true },
+      }),
+    ]);
 
     const records: CallRecord[] = calls.map(call => ({
       id: call.id,
@@ -78,10 +85,14 @@ export async function GET(req: NextRequest): Promise<NextResponse<any>> {
     const taggedCalls = periodRecords.filter(
       call => call.messageCount > 0,
     ).length;
-    const unhandledCalls = findUnhandledCalls(records, {
-      from: fromDate,
-      to: toDate,
-    });
+    const unhandledCalls = findUnhandledCalls(
+      records,
+      {
+        from: fromDate,
+        to: toDate,
+      },
+      marks.map(mark => mark.phoneCallId),
+    );
 
     const statistics: CallsStatistics = {
       outgoing: outgoingCalls,

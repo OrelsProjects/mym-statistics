@@ -10,6 +10,9 @@
  * - Nothing later handled the same number (digits only, 972 / leading 0
  *   ignored): a later OUTGOING call, a later answered call, or any later
  *   call to that number that has a sent message.
+ * - The logged-in user has not manually marked that specific call handled.
+ *   The mark is per call id. A later call from the same number is unhandled
+ *   again until something handles that new call.
  *
  * Follow-up is checked through now, including after the selected period, so
  * the list is "still unhandled" rather than "was unhandled at the time".
@@ -78,6 +81,7 @@ function countsAsFollowUp(call: CallRecord): boolean {
 export function findUnhandledCalls(
   calls: CallRecord[],
   range?: { from: Date; to: Date },
+  manuallyHandledIds?: ReadonlySet<string> | readonly string[],
 ): UnhandledCall[] {
   const byId = new Map<string, CallRecord>();
   for (const call of calls) {
@@ -86,12 +90,16 @@ export function findUnhandledCalls(
   const unique = Array.from(byId.values());
   const fromTime = range?.from.getTime();
   const toTime = range?.to.getTime();
+  const handledIds = new Set(manuallyHandledIds ?? []);
 
   const unhandled: UnhandledCall[] = [];
   for (const call of unique) {
     const time = call.startDate.getTime();
     if (fromTime !== undefined && time < fromTime) continue;
     if (toTime !== undefined && time > toTime) continue;
+    // A manual mark hides this call in every date range. It does not
+    // count as a follow-up, so other calls from the same number stay.
+    if (handledIds.has(call.id)) continue;
     if (!isUnansweredInbound(call)) continue;
     if (call.messageCount > 0) continue;
 

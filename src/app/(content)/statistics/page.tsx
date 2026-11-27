@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   format,
   startOfWeek,
@@ -28,8 +28,26 @@ import { UnhandledCallList } from "@/app/(content)/statistics/unhandledCallList"
 
 type DateRange = "daily" | "weekly" | "monthly" | "custom";
 
+function withoutHiddenMarks(
+  data: CallsStatistics,
+  hiddenIds: Set<string>,
+): CallsStatistics {
+  const unhandledCalls = (data.unhandledCalls || []).filter(
+    call => !hiddenIds.has(call.id),
+  );
+  return {
+    ...data,
+    incoming: data.incoming || 0,
+    outgoing: data.outgoing || 0,
+    tagged: data.tagged || 0,
+    unhandled: unhandledCalls.length,
+    unhandledCalls,
+  };
+}
+
 export default function StatisticsDashboard() {
-  const { getMessagesSentStatistics, getCallsStatistics } = useStatistics();
+  const { getMessagesSentStatistics, getCallsStatistics, markCallsHandled } =
+    useStatistics();
   const [messagesSentData, setMessageSentData] = useState<
     MessageSentStatistics[]
   >([]);
@@ -44,6 +62,12 @@ export default function StatisticsDashboard() {
   const [dateRange, setDateRange] = useState<{ from: Date; to?: Date }>({
     from: new Date(),
   });
+  const hiddenIds = useRef(new Set<string>());
+  const callsRef = useRef(callsData);
+  const dateRangeRef = useRef(dateRange);
+  const fetchDataRef = useRef<(from: Date, to: Date) => void>(() => {});
+  callsRef.current = callsData;
+  dateRangeRef.current = dateRange;
 
   const [loading, setLoading] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false); // State to control Calendar visibility
@@ -70,17 +94,68 @@ export default function StatisticsDashboard() {
 
       setLoading(false);
       setMessageSentData(newMessagesSentData);
-      setCallsData({
-        incoming: newCallsData.incoming || 0,
-        outgoing: newCallsData.outgoing || 0,
-        tagged: newCallsData.tagged || 0,
-        unhandled: newCallsData.unhandled || 0,
-        unhandledCalls: newCallsData.unhandledCalls || [],
-      });
+      const nextCalls = withoutHiddenMarks(
+        {
+          incoming: newCallsData.incoming || 0,
+          outgoing: newCallsData.outgoing || 0,
+          tagged: newCallsData.tagged || 0,
+          unhandled: newCallsData.unhandled || 0,
+          unhandledCalls: newCallsData.unhandledCalls || [],
+        },
+        hiddenIds.current,
+      );
+      callsRef.current = nextCalls;
+      setCallsData(nextCalls);
     } catch (error) {
       if (!axios.isCancel(error)) {
         toast.error("שגיאה בטעינת הנתונים");
         setLoading(false);
+      }
+    }
+  };
+  fetchDataRef.current = fetchData;
+
+  const handleMarkHandled = async (ids: string[]) => {
+    const fresh = ids.filter(id => id && !hiddenIds.current.has(id));
+    if (fresh.length === 0) return;
+
+    const rangeAtClick = {
+      from: dateRangeRef.current.from,
+      to: dateRangeRef.current.to,
+    };
+    const idSet = new Set(fresh);
+    const snapshot = callsRef.current;
+    const removed = snapshot.unhandledCalls.filter(call => idSet.has(call.id));
+    fresh.forEach(id => hiddenIds.current.add(id));
+
+    const next = withoutHiddenMarks(snapshot, hiddenIds.current);
+    callsRef.current = next;
+    setCallsData(next);
+
+    try {
+      await markCallsHandled(fresh);
+    } catch (error) {
+      fresh.forEach(id => hiddenIds.current.delete(id));
+      const active = dateRangeRef.current;
+      const sameRange =
+        active.from.getTime() === rangeAtClick.from.getTime() &&
+        (active.to?.getTime() ?? null) === (rangeAtClick.to?.getTime() ?? null);
+      if (sameRange && callsRef.current === next) {
+        const merged = [...next.unhandledCalls, ...removed].sort((a, b) => {
+          if (a.startDate === b.startDate) return 0;
+          return a.startDate < b.startDate ? 1 : -1;
+        });
+        const rolled = withoutHiddenMarks(
+          { ...next, unhandledCalls: merged, unhandled: merged.length },
+          hiddenIds.current,
+        );
+        callsRef.current = rolled;
+        setCallsData(rolled);
+      } else if (active.to) {
+        fetchDataRef.current(active.from, active.to);
+      }
+      if (!axios.isCancel(error)) {
+        toast.error("שגיאה בסימון השיחות כטופלו");
       }
     }
   };
@@ -300,7 +375,10 @@ export default function StatisticsDashboard() {
                 ]}
               />
             </div>
-            <UnhandledCallList calls={callsData.unhandledCalls || []} />
+            <UnhandledCallList
+              calls={callsData.unhandledCalls || []}
+              onMarkHandled={handleMarkHandled}
+            />
           </div>
         </CardContent>
       </Card>

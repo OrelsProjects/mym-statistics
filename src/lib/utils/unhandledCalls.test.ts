@@ -194,3 +194,83 @@ test("outgoing calls are never unhandled", () => {
   ]);
   assert.equal(result.length, 0);
 });
+
+test("a manually marked call is excluded from every date range and does not count", () => {
+  const missed = call({
+    id: "m1",
+    startDate: new Date("2026-11-15T08:00:00.000Z"),
+  });
+  const other = call({
+    id: "other",
+    number: "0500000001",
+    startDate: new Date("2026-11-15T09:00:00.000Z"),
+  });
+  const handled = new Set(["m1"]);
+  const ranges: Array<{ from: Date; to: Date } | undefined> = [
+    undefined,
+    {
+      from: new Date("2026-11-15T00:00:00.000Z"),
+      to: new Date("2026-11-15T23:59:59.999Z"),
+    },
+    {
+      from: new Date("2026-11-09T00:00:00.000Z"),
+      to: new Date("2026-11-15T23:59:59.999Z"),
+    },
+    {
+      from: new Date("2026-11-01T00:00:00.000Z"),
+      to: new Date("2026-11-30T23:59:59.999Z"),
+    },
+    {
+      from: new Date("2026-10-01T00:00:00.000Z"),
+      to: new Date("2026-12-31T23:59:59.999Z"),
+    },
+  ];
+
+  for (const range of ranges) {
+    const result = findUnhandledCalls([missed, other], range, handled);
+    assert.deepEqual(
+      result.map(item => item.id),
+      ["other"],
+    );
+  }
+});
+
+test("a new call from the same number after a manual mark is unhandled again", () => {
+  const result = findUnhandledCalls(
+    [
+      call({ id: "marked", startDate: new Date("2026-11-01T08:00:00.000Z") }),
+      call({ id: "later", startDate: new Date("2026-11-02T08:00:00.000Z") }),
+    ],
+    undefined,
+    ["marked"],
+  );
+  assert.deepEqual(
+    result.map(item => item.id),
+    ["later"],
+  );
+});
+
+test("a manual mark is not a follow-up, so an earlier call from the same number stays", () => {
+  const result = findUnhandledCalls(
+    [
+      call({ id: "earlier", startDate: new Date("2026-11-01T08:00:00.000Z") }),
+      call({ id: "later", startDate: new Date("2026-11-02T08:00:00.000Z") }),
+    ],
+    undefined,
+    new Set(["later"]),
+  );
+  assert.deepEqual(
+    result.map(item => item.id),
+    ["earlier"],
+  );
+});
+
+test("handled ids that are not in the call list are ignored", () => {
+  const result = findUnhandledCalls([call({ id: "m1" })], undefined, [
+    "missing",
+  ]);
+  assert.deepEqual(
+    result.map(item => item.id),
+    ["m1"],
+  );
+});

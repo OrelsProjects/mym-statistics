@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   UnhandledCall,
@@ -16,14 +19,45 @@ function callKindLabel(type: string): string {
   return type === "MISSED" ? "לא נענתה" : "נכנסת שלא נענתה";
 }
 
-export function UnhandledCallList({ calls }: { calls: UnhandledCall[] }) {
+export function UnhandledCallList({
+  calls,
+  onMarkHandled,
+}: {
+  calls: UnhandledCall[];
+  onMarkHandled: (ids: string[]) => Promise<void>;
+}) {
+  const markingIds = useRef(new Set<string>());
+
+  const mark = (ids: string[]) => {
+    const fresh = ids.filter(id => !markingIds.current.has(id));
+    if (fresh.length === 0) return;
+    fresh.forEach(id => markingIds.current.add(id));
+    void onMarkHandled(fresh).finally(() => {
+      fresh.forEach(id => markingIds.current.delete(id));
+    });
+  };
+
   return (
     <div className="w-full mt-6 flex flex-col gap-3" dir="rtl">
-      <div>
-        <h3 className="text-lg 4k:text-4xl font-bold">שיחות שלא טופלו</h3>
-        <p className="text-sm 4k:text-2xl text-muted-foreground">
-          שיחה נכנסת או שלא נענתה, בלי הודעה שנשלחה ובלי חזרה לאותו מספר אחר כך.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h3 className="text-lg 4k:text-4xl font-bold">שיחות שלא טופלו</h3>
+          <p className="text-sm 4k:text-2xl text-muted-foreground">
+            שיחה נכנסת או שלא נענתה, בלי הודעה שנשלחה ובלי חזרה לאותו מספר אחר
+            כך.
+          </p>
+        </div>
+        {calls.length > 0 && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0"
+            onClick={() => mark(calls.map(call => call.id))}
+          >
+            סמן הכל כטופל
+          </Button>
+        )}
       </div>
       {calls.length === 0 ? (
         <p className="text-muted-foreground">אין שיחות שלא טופלו בתקופה הזו</p>
@@ -55,6 +89,14 @@ export function UnhandledCallList({ calls }: { calls: UnhandledCall[] }) {
                     >
                       וואטסאפ
                     </a>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => mark([call.id])}
+                  >
+                    סמן כטופל
                   </Button>
                 </div>
               </li>
