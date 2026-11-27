@@ -24,6 +24,7 @@ import { toast } from "react-toastify";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import CustomPieChart from "@/components/ui/chart/pieChart";
+import { UnhandledCallList } from "@/app/(content)/statistics/unhandledCallList";
 
 type DateRange = "daily" | "weekly" | "monthly" | "custom";
 
@@ -36,6 +37,8 @@ export default function StatisticsDashboard() {
     incoming: 0,
     outgoing: 0,
     tagged: 0,
+    unhandled: 0,
+    unhandledCalls: [],
   });
   const [dateRangeType, setDateRangeType] = useState<DateRange>("daily");
   const [dateRange, setDateRange] = useState<{ from: Date; to?: Date }>({
@@ -68,9 +71,11 @@ export default function StatisticsDashboard() {
       setLoading(false);
       setMessageSentData(newMessagesSentData);
       setCallsData({
-        ...newCallsData,
         incoming: newCallsData.incoming || 0,
         outgoing: newCallsData.outgoing || 0,
+        tagged: newCallsData.tagged || 0,
+        unhandled: newCallsData.unhandled || 0,
+        unhandledCalls: newCallsData.unhandledCalls || [],
       });
     } catch (error) {
       if (!axios.isCancel(error)) {
@@ -186,8 +191,10 @@ export default function StatisticsDashboard() {
           </TabsContent>
         </Tabs>
         <p className="text-lg 4k:text-4xl font-bold">
-          {moment(dateRange.from).format("YYYY/MM/DD")} -{" "}
-          {moment(dateRange.to).format("YYYY/MM/DD")}
+          {dateRange.from ? moment(dateRange.from).format("YYYY/MM/DD") : ""}
+          {dateRange.to
+            ? ` - ${moment(dateRange.to).format("YYYY/MM/DD")}`
+            : ""}
         </p>
       </div>
 
@@ -240,7 +247,7 @@ export default function StatisticsDashboard() {
             >
               <Loader2 className="w-24 h-24 text-primary animate-spin" />
             </div>
-            <div className="flex flex-col md:flex-row md:justify-between gap-1">
+            <div className="flex flex-col md:flex-row md:flex-wrap md:justify-between gap-2">
               <CustomPieChart
                 loading={loading}
                 title="שיחות יוצאות"
@@ -274,12 +281,26 @@ export default function StatisticsDashboard() {
                 items={[
                   {
                     label: "שיחות מתוייגות",
-                    value: callsData.tagged,
+                    value: callsData.tagged || 0,
                     fill: "#2196F380",
                   },
                 ]}
               />
+
+              <CustomPieChart
+                loading={loading}
+                title="שיחות שלא טופלו"
+                totalItemsTitle="לא טופלו"
+                items={[
+                  {
+                    label: "שיחות שלא טופלו",
+                    value: callsData.unhandled || 0,
+                    fill: "#E5393580",
+                  },
+                ]}
+              />
             </div>
+            <UnhandledCallList calls={callsData.unhandledCalls || []} />
           </div>
         </CardContent>
       </Card>

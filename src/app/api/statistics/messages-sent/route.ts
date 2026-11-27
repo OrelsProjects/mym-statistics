@@ -1,17 +1,16 @@
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "@/auth/authOptions";
 import prisma from "@/app/api/_db/db";
 import { PhonecallCountStatistics } from "@/models/statistics";
 import loggerServer from "@/loggerServer";
 import moment from "moment";
+import { requireUser } from "@/app/api/_utils/requireUser";
 
 export async function GET(
   req: NextRequest,
 ): Promise<NextResponse<PhonecallCountStatistics | any>> {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) {
+    return auth.response;
   }
   try {
     const from = req.nextUrl.searchParams.get("from");
@@ -24,8 +23,14 @@ export async function GET(
       );
     }
 
-    const fromDate = moment(from).startOf("day").toDate();
-    const toDate = moment(to).endOf("day").toDate();
+    const fromMoment = moment(from);
+    const toMoment = moment(to);
+    if (!fromMoment.isValid() || !toMoment.isValid()) {
+      return NextResponse.json({ error: "Invalid date" }, { status: 400 });
+    }
+
+    const fromDate = fromMoment.clone().startOf("day").toDate();
+    const toDate = toMoment.clone().endOf("day").toDate();
 
     const group = await prisma.messageSent.groupBy({
       by: ["messageId"],
@@ -35,7 +40,7 @@ export async function GET(
           lte: toDate,
         },
         message: {
-          userId: "aec62020-877f-4f18-b9c2-3d767791d46b",
+          userId: auth.userId,
         },
       },
       _count: {
@@ -74,7 +79,7 @@ export async function GET(
   } catch (error) {
     loggerServer.error(
       "Error in GET /api/statistics/callsCount/:type",
-      session.user?.userId,
+      auth.userId,
       { data: { error } },
     );
     return NextResponse.json(

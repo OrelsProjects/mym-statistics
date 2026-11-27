@@ -1,20 +1,19 @@
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../../../../auth/authOptions";
 import Logger from "../../../../loggerServer";
 import prisma from "../../_db/db";
 import { OngoingCall } from "@prisma/client";
+import { requireUser } from "../../_utils/requireUser";
 
 const MAX_TIME_DIFF = 10000;
 
 export async function GET(req: NextRequest): Promise<any> {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireUser();
+  if (!auth.ok) {
+    return auth.response;
   }
 
   try {
-    const { userId } = session.user;
+    const { userId } = auth;
 
     const ongoingCall = await prisma.ongoingCall.findFirst({
       where: {
@@ -80,9 +79,13 @@ export async function GET(req: NextRequest): Promise<any> {
 
     return NextResponse.json(responseBody, { status: 200 });
   } catch (error: any) {
-    Logger.error("Error getting latest ongoing call", session.user?.userId, {
+    Logger.error("Error getting latest ongoing call", auth.userId, {
       error,
     });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
 

@@ -11,9 +11,16 @@ export default function useFolder() {
   const updateFolder = async (folder: Partial<Folder>, folderId: string) => {
     // api/messages patch
     const oldData = [...folders];
-    const optimisticUpdate = (folder: Partial<Folder>) => {
-      const newData = folders.map(folder =>
-        folder.id === folderId ? { ...folder } : folder,
+    const optimisticUpdate = (next: Partial<Folder>) => {
+      const newData = folders.map(existing =>
+        existing.id === folderId
+          ? {
+              ...existing,
+              ...next,
+              id: existing.id,
+              userId: existing.userId,
+            }
+          : existing,
       );
       dispatch(setFolders(newData));
     };
@@ -52,7 +59,7 @@ export default function useFolder() {
       console.error(error);
       dispatch(setFolders(oldData));
       throw error;
-    } 
+    }
   };
 
   const deleteFolder = async (folderId: string) => {

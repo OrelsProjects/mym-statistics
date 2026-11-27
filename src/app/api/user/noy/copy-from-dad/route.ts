@@ -5,12 +5,22 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const dadId = "aec62020-877f-4f18-b9c2-3d767791d46b";
-const noyId = "f7b10db2-657b-4784-946e-cb91d57b36ce";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-
-  const idToCopyTo = session?.user?.userId || noyId;
+  const idToCopyTo = session?.user?.userId;
+  if (!idToCopyTo) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  // This replaces the caller's folders and messages with dad's templates.
+  // Never run it against the source account, and never fall back to a
+  // hardcoded user when nobody is logged in.
+  if (idToCopyTo === dadId) {
+    return NextResponse.json(
+      { error: "Refusing to overwrite the source account" },
+      { status: 400 },
+    );
+  }
 
   const dadMessages = await prisma.message.findMany({
     where: {
@@ -26,7 +36,13 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  const messagesInFolders = await prisma.messageInFolder.findMany();
+  const messagesInFolders = await prisma.messageInFolder.findMany({
+    where: {
+      messageId: {
+        in: dadMessages.map(message => message.id),
+      },
+    },
+  });
 
   // build a folder name to messages body map
   const folderNameToMessagesBodyMap = new Map<string, string[]>();

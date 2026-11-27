@@ -10,7 +10,7 @@ import { cn } from "../../lib/utils";
 export interface NavigationBarItem {
   icon: ElementType;
   iconActive: ElementType;
-  label: "סטטיסטקות" | "הודעות" | "תיקיות";
+  label: "סטטיסטיקות" | "הודעות" | "תיקיות";
   href: string;
 }
 
@@ -46,7 +46,7 @@ export const BottomBarItems: NavigationBarItem[] = [
     iconActive: ({ className }: { className?: string }) => (
       <IoStatsChart className={cn(classNameActive, className)} />
     ),
-    label: "סטטיסטקות",
+    label: "סטטיסטיקות",
     href: "/statistics",
   },
 ];
