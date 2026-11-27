@@ -1,3 +1,5 @@
+import { UnhandledCall } from "@/lib/utils/unhandledCalls";
+
 export interface MessageSentStatistics {
   title: string;
   count: string;
@@ -7,6 +9,8 @@ export interface CallsStatistics {
   incoming: number;
   outgoing: number;
   tagged: number;
+  unhandled: number;
+  unhandledCalls: UnhandledCall[];
 }
 
 // interface GroupedStatistics {

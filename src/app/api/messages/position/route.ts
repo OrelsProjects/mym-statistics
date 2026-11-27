@@ -1,21 +1,33 @@
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "@/auth/authOptions";
 import prisma from "@/app/api/_db/db";
 import Logger from "@/loggerServer";
 import { MessagePosition } from "@/lib/hooks/useMessage";
+import { requireUser } from "@/app/api/_utils/requireUser";
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { messageId: string } },
-): Promise<any> {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function PATCH(req: NextRequest): Promise<any> {
+  const auth = await requireUser();
+  if (!auth.ok) {
+    return auth.response;
   }
   try {
     const body = (await req.json()) as MessagePosition[];
-    Logger.info("Updating messages position", session.user?.userId, {
+    if (
+      !Array.isArray(body) ||
+      body.some(item => !item?.id || typeof item.position !== "number")
+    ) {
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    }
+
+    const ids = Array.from(new Set(body.map(item => item.id)));
+    const owned = await prisma.message.findMany({
+      where: { id: { in: ids }, userId: auth.userId },
+      select: { id: true },
+    });
+    if (owned.length !== ids.length) {
+      return NextResponse.json({ error: "Message not found" }, { status: 404 });
+    }
+
+    Logger.info("Updating messages position", auth.userId, {
       data: {
         body,
       },
@@ -30,7 +42,7 @@ export async function PATCH(
     );
     return NextResponse.json({}, { status: 200 });
   } catch (error: any) {
-    Logger.error("Error deleting message", session.user?.userId, { error });
+    Logger.error("Error updating message position", auth.userId, { error });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

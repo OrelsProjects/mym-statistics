@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Message } from "@prisma/client";
 import Loading from "@/components/ui/loading";
 import { Button } from "@/components/ui/button";
@@ -26,14 +32,18 @@ const MessagePage: React.FC<MessagePageProps> = () => {
     "createdAt"
   > | null>(null);
 
+  const getLatestOngoingCallRef = useRef(getLatestOngoingCall);
+  getLatestOngoingCallRef.current = getLatestOngoingCall;
+
   useEffect(() => {
-    addEventListener("visibilitychange", () => {
+    const onVisible = () => {
       if (document.visibilityState === "visible") {
-        getLatestOngoingCall();
+        getLatestOngoingCallRef.current();
       }
-    });
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
-      removeEventListener("visibilitychange", getLatestOngoingCall);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
@@ -133,7 +143,7 @@ const MessagePage: React.FC<MessagePageProps> = () => {
             position: 0,
             timesUsed: 0,
             isActive: true,
-          })
+          });
         }}
       >
         הוסף הודעה
