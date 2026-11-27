@@ -3,6 +3,10 @@ import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/api/_db/db";
 import { requireUser } from "@/app/api/_utils/requireUser";
+import {
+  HANDLED_MARKS_UNAVAILABLE_MESSAGE,
+  isMissingHandledCallMarksTable,
+} from "@/lib/utils/handledCallMarks";
 import loggerServer from "@/loggerServer";
 
 const MAX_IDS = 5000;
@@ -74,6 +78,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ marked: ids.length }, { status: 200 });
   } catch (error) {
+    if (isMissingHandledCallMarksTable(error)) {
+      return NextResponse.json(
+        { error: HANDLED_MARKS_UNAVAILABLE_MESSAGE },
+        { status: 503 },
+      );
+    }
     if (error instanceof CallNotFoundError) {
       return NextResponse.json({ error: "Call not found" }, { status: 404 });
     }

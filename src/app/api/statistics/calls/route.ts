@@ -4,6 +4,7 @@ import moment from "moment";
 import loggerServer from "@/loggerServer";
 import { CallsStatistics } from "@/lib/utils/statisticsUtils";
 import { CallRecord, findUnhandledCalls } from "@/lib/utils/unhandledCalls";
+import { loadHandledCallIds } from "@/lib/utils/handledCallMarks";
 import { requireUser } from "@/app/api/_utils/requireUser";
 
 export async function GET(req: NextRequest): Promise<NextResponse<any>> {
@@ -36,6 +37,8 @@ export async function GET(req: NextRequest): Promise<NextResponse<any>> {
     // loaded too so a callback made later still clears an older missed call.
     // endDate is not used: missed calls often have no reliable end.
     // Manual marks are per user, so one account cannot hide another's calls.
+    // The marks table may not exist until the production migration runs.
+    // That case returns no marks and leaves these statistics unchanged.
     const [calls, marks] = await Promise.all([
       prisma.phoneCall.findMany({
         where: {
@@ -56,10 +59,14 @@ export async function GET(req: NextRequest): Promise<NextResponse<any>> {
           },
         },
       }),
-      prisma.handledCallMark.findMany({
-        where: { userId: auth.userId },
-        select: { phoneCallId: true },
-      }),
+      loadHandledCallIds(() =>
+        prisma.handledCallMark
+          .findMany({
+            where: { userId: auth.userId },
+            select: { phoneCallId: true },
+          })
+          .then(rows => rows.map(row => row.phoneCallId)),
+      ),
     ]);
 
     const records: CallRecord[] = calls.map(call => ({
@@ -91,7 +98,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<any>> {
         from: fromDate,
         to: toDate,
       },
-      marks.map(mark => mark.phoneCallId),
+      marks,
     );
 
     const statistics: CallsStatistics = {

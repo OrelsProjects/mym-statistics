@@ -25,8 +25,22 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import CustomPieChart from "@/components/ui/chart/pieChart";
 import { UnhandledCallList } from "@/app/(content)/statistics/unhandledCallList";
+import { HANDLED_MARKS_UNAVAILABLE_MESSAGE } from "@/lib/utils/handledCallMarks";
 
 type DateRange = "daily" | "weekly" | "monthly" | "custom";
+
+function markHandledErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error) && error.response?.status === 503) {
+    const data = error.response.data;
+    if (typeof data === "string" && data.trim()) return data;
+    if (data && typeof data === "object" && "error" in data) {
+      const message = (data as { error?: unknown }).error;
+      if (typeof message === "string" && message.trim()) return message;
+    }
+    return HANDLED_MARKS_UNAVAILABLE_MESSAGE;
+  }
+  return "שגיאה בסימון השיחות כטופלו";
+}
 
 function withoutHiddenMarks(
   data: CallsStatistics,
@@ -155,7 +169,7 @@ export default function StatisticsDashboard() {
         fetchDataRef.current(active.from, active.to);
       }
       if (!axios.isCancel(error)) {
-        toast.error("שגיאה בסימון השיחות כטופלו");
+        toast.error(markHandledErrorMessage(error));
       }
     }
   };
